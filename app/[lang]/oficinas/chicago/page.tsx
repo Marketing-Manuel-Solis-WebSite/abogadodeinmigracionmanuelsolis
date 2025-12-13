@@ -1,67 +1,25 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Phone, Clock, Star, CheckCircle2, Play, X } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { MapPin, Phone, Clock, Star, CheckCircle2, Sparkles, Play } from 'lucide-react';
 import Image from 'next/image';
+import { Outfit } from 'next/font/google';
+import { useParams } from 'next/navigation';
 
-// IMPORTACIONES DE COMPONENTES GLOBALES
-import Header from '../../../components/Header'; 
+// --- IMPORTACIONES REQUERIDAS ---
+import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-import ContactForm from '../../../components/ContactForm'; 
+import ContactForm from '../../../components/ContactForm';
 
-// --- TIPOS DE DATOS ---
-type TeamMember = {
-  name: string;
-  image: string;
-  role: { es: string; en: string };
-};
+// --- CONFIGURACIÓN DE FUENTE ---
+const font = Outfit({ 
+  subsets: ['latin'], 
+  weight: ['100', '200', '300', '400', '500', '800', '900'] 
+});
 
-type OfficeData = {
-  id: string;
-  city: string;
-  state: string;
-  title: { es: string; en: string };
-  quote: { es: string; en: string };
-  description: { es: string; en: string };
-  address: string;
-  phone: string;
-  email: string;
-  hours: { es: string; en: string };
-  mapLink: string;
-  videoUrl?: string;
-  services: { es: string; en: string }[];
-  managers: TeamMember[];
-  attorneys: TeamMember[];
-};
-
-// --- TEXTOS DE LA INTERFAZ FIJA ---
-const interfaceTexts = {
-  header: {
-    title: { es: 'Nuestra Sede de Chicago', en: 'Our Chicago Location' },
-    subtitle: { 
-      es: 'Información detallada, servicios y el equipo legal a su disposición en Chicago, IL.', 
-      en: 'Detailed information, services, and the legal team at your disposal in Chicago, IL.' 
-    },
-  },
-  contact: {
-    address: { es: 'Dirección', en: 'Address' },
-    phone: { es: 'Teléfono', en: 'Phone' },
-    hours: { es: 'Horario', en: 'Hours' },
-    viewOnMap: { es: 'Ver en mapa', en: 'View on map' },
-    servicesTitle: { es: 'Servicios en esta sede', en: 'Services at this Location' },
-    attorneysTitle: { es: 'Nuestros Abogados', en: 'Our Attorneys' },
-    managersTitle: { es: 'Nuestra Gerencia', en: 'Our Management Team' },
-    videoError: { es: 'Tu navegador no soporta el video.', en: 'Your browser does not support the video.' }
-  },
-  form: {
-    request: { es: 'SOLICITE SU CONSULTA', en: 'REQUEST YOUR CONSULTATION' },
-    callback: { es: 'Llene este formulario y le llamaremos en unos 10 minutos en horas de trabajo.', en: 'Fill out this form, and we will call you back in about 10 minutes during business hours.' }
-  }
-};
-
-// --- DATA ESPECÍFICA DE CHICAGO ---
-const chicagoData: OfficeData = {
+// --- DATOS ESPECÍFICOS: CHICAGO ---
+const officeData = {
   id: 'chicago',
   city: 'Chicago',
   state: 'IL',
@@ -75,9 +33,9 @@ const chicagoData: OfficeData = {
   mapLink: 'https://maps.app.goo.gl/adcMEbA5fnTXEWA1A',
   videoUrl: 'https://manuelsolis.com/wp-content/uploads/2023/12/chicago-office.mp4',
   services: [
-    { es: 'LEY CRIMINAL', en: 'CRIMINAL LAW' }, 
-    { es: 'LEY DE FAMILIA', en: 'FAMILY LAW' }, 
-    { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' }, 
+    { es: 'LEY CRIMINAL', en: 'CRIMINAL LAW' },
+    { es: 'LEY DE FAMILIA', en: 'FAMILY LAW' },
+    { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' },
     { es: 'ACCIDENTES', en: 'ACCIDENTS' }
   ],
   managers: [
@@ -94,302 +52,278 @@ const chicagoData: OfficeData = {
   ]
 };
 
-// --- FUNCIÓN DE AYUDA PARA OBTENER EL TEXTO TRADUCIDO ---
-const lang: 'es' | 'en' = 'es';
-
-const getText = (obj: string | { es: string; en: string }, currentLang: 'es' | 'en'): string => {
-  if (typeof obj === 'string') return obj;
-  return obj[currentLang] || obj.es; 
+// --- TEXTOS DE INTERFAZ ---
+const uiText = {
+  address: { es: 'Dirección', en: 'Address' },
+  phone: { es: 'Teléfono', en: 'Phone' },
+  hours: { es: 'Horario', en: 'Hours' },
+  viewMap: { es: 'Ver en mapa', en: 'View on map' },
+  services: { es: 'Servicios en esta sede', en: 'Services at this Location' },
+  team: { es: 'Nuestro Equipo Legal', en: 'Our Legal Team' },
+  managers: { es: 'Gerencia', en: 'Management' }
 };
 
-const t = (key: string): string => {
-  const parts = key.split('.');
-  let current: any = interfaceTexts;
-  for (const part of parts) {
-    if (current && current[part]) {
-      current = current[part];
-    } else {
-      return ''; 
-    }
-  }
-  return current[lang] || current.es;
-};
-
-const gT = (obj: any): string => getText(obj, lang);
-
-// --- COMPONENTE DE PÁGINA ESPECÍFICO DE CHICAGO ---
-export default function ChicagoOfficePage() {
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  
-  const activeOffice = chicagoData;
-
-  useEffect(() => {
-    if (activeOffice.videoUrl) {
-        setIsVideoLoaded(true); 
-    }
-  }, [activeOffice.videoUrl]);
+export default function ChicagoPage() {
+  const params = useParams();
+  const lang = (params?.lang as 'es' | 'en') || 'es';
+  const t = (obj: any) => obj[lang] || obj.es;
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <>
+      <Header />
+      
+      <main className={`relative w-full min-h-screen bg-[#001540] overflow-hidden ${font.className}`}>
         
-        {/* 1. HEADER */}
-        <Header />
-        
-        {/* 2. MAIN CONTENT */}
-        <main className="flex-grow">
-            {/* AÑADIDO: pt-24 md:pt-32 para bajar el contenido y separarlo del Header */}
-            <section className="w-full bg-white pt-24 md:pt-32 pb-20 overflow-x-hidden" id='chicago-office'>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    
-                    {/* --- Section Header --- */}
-                    <div className="text-center mb-8 pt-8 md:pt-12">
-                        <motion.h2 
-                            initial={{ opacity: 0, y: -20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className="text-3xl md:text-5xl font-serif font-bold text-[#002342] mb-3"
-                        >
-                            {t('header.title')}
-                        </motion.h2>
-                        <div className="w-24 h-1 bg-[#B2904D] mx-auto rounded-full mb-6"></div>
-                        <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base">
-                            {t('header.subtitle')}
-                        </p>
-                    </div>
+        {/* --- BACKGROUND FX --- */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
+          
+          <motion.div 
+            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-blue-600/20 rounded-full blur-[150px]" 
+          />
+          <motion.div 
+            animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+            className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-sky-800/20 rounded-full blur-[180px]" 
+          />
+          
+          <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+        </div>
 
-                    {/* --- Main Content --- */}
-                    <div className="lg:col-span-12"> 
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, ease: "easeOut" }}
-                            className="bg-white rounded-2xl md:rounded-3xl shadow-lg md:shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full"
-                        >
-                            
-                            {/* A. Hero Area (Video/Image) */}
-                            <div className="relative h-[250px] md:h-[450px] w-full bg-[#002342] overflow-hidden group">
-                                
-                                {/* Video Background */}
-                                {activeOffice.videoUrl ? (
-                                    <video 
-                                        autoPlay muted loop playsInline
-                                        onLoadedData={() => setIsVideoLoaded(true)}
-                                        className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${isVideoLoaded ? 'opacity-70' : 'opacity-0'}`} 
-                                    >
-                                        <source src={activeOffice.videoUrl} type="video/mp4" />
-                                        <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
-                                    </video>
-                                ) : (
-                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
-                                )}
+        {/* --- CONTENIDO PRINCIPAL --- */}
+        <div className="relative z-10 pt-[160px] pb-20">
+          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
 
-                                {/* Overlay Gradient */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-[#002342] via-transparent to-transparent opacity-90 md:opacity-80" />
-                                
-                                {/* Play Button */}
-                                {activeOffice.videoUrl && (
-                                    <div className="absolute top-3 right-3 md:top-6 md:right-6 z-30">
-                                        <button 
-                                            onClick={() => setIsVideoOpen(true)}
-                                            className="flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/30 h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-[#B2904D] transition-colors"
-                                        >
-                                            <Play size={20} fill="white" className="text-white" />
-                                        </button>
-                                    </div>
-                                )}
-
-                                {/* Bottom Hero Text */}
-                                <div className="absolute bottom-0 left-0 w-full p-5 md:p-12 text-white z-10">
-                                    <motion.div 
-                                        initial={{ opacity: 0, y: 10 }} 
-                                        animate={{ opacity: 1, y: 0 }} 
-                                        transition={{ delay: 0.2 }}
-                                    >
-                                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                                            <span className="bg-[#B2904D] text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
-                                                <MapPin size={10} /> {activeOffice.city}, {activeOffice.state}
-                                            </span>
-                                        </div>
-                                        <h3 className="text-2xl md:text-5xl font-serif font-bold mb-1 md:mb-3 leading-tight text-white">
-                                            {gT(activeOffice.title)}
-                                        </h3>
-                                        <p className="text-[#B2904D] font-medium italic text-sm md:text-xl max-w-3xl line-clamp-2 md:line-clamp-none">
-                                            "{gT(activeOffice.quote)}"
-                                        </p>
-                                    </motion.div>
-                                </div>
-                            </div>
-
-                            {/* B. Content Body */}
-                            <div className="p-5 md:p-12 space-y-8 md:space-y-12">
-                                
-                                {/* 1. Description and Services */}
-                                <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12">
-                                    <div>
-                                        <p className="text-gray-600 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 text-justify">
-                                            {gT(activeOffice.description)}
-                                        </p>
-                                        
-                                        {/* Contact Grid */}
-                                        <div className="space-y-3 md:space-y-4 bg-gray-50 p-4 rounded-xl md:bg-transparent md:p-0">
-                                            <div className="flex items-start gap-3 md:gap-4">
-                                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><MapPin size={16}/></div>
-                                                <div>
-                                                    <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.address')}</p>
-                                                    <p className="text-[#002342] font-medium text-sm md:text-base">{activeOffice.address}</p>
-                                                    <a href={activeOffice.mapLink} target="_blank" className="text-[#B2904D] text-xs font-bold hover:underline mt-1 inline-block">{t('contact.viewOnMap')}</a>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 md:gap-4">
-                                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Phone size={16}/></div>
-                                                <div>
-                                                    <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.phone')}</p>
-                                                    <a href={`tel:${activeOffice.phone}`} className="text-[#002342] font-bold hover:text-[#B2904D] text-sm md:text-base">{activeOffice.phone}</a>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-3 md:gap-4">
-                                                <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Clock size={16}/></div>
-                                                <div>
-                                                    <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.hours')}</p>
-                                                    <p className="text-[#002342] font-medium text-sm md:text-base">{gT(activeOffice.hours)}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Services List */}
-                                    <div className="bg-gray-50 rounded-xl p-5 md:p-8 border border-gray-100">
-                                        <h4 className="text-lg md:text-xl font-serif font-bold text-[#002342] mb-4 md:mb-6 flex items-center gap-2">
-                                            <Star className="text-[#B2904D]" size={18} fill="#B2904D" /> {t('contact.servicesTitle')}
-                                        </h4>
-                                        <ul className="space-y-2 md:space-y-4">
-                                            {activeOffice.services.map((service, idx) => (
-                                                <li key={idx} className="flex items-center gap-2 md:gap-3">
-                                                    <CheckCircle2 className="text-[#B2904D] shrink-0" size={16} />
-                                                    <span className="text-[#002342] font-bold text-xs md:text-sm tracking-wide">{gT(service)}</span>
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="w-full h-px bg-gray-100" />
-
-                                {/* 2. Team */}
-                                <div>
-                                    {/* Attorneys */}
-                                    {activeOffice.attorneys.length > 0 && (
-                                        <div className="mb-8 md:mb-12">
-                                            <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
-                                                <div className="w-1 h-6 md:h-8 bg-[#B2904D] rounded-full"></div>
-                                                <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">{t('contact.attorneysTitle')}</h4>
-                                            </div>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                                {activeOffice.attorneys.map((person, idx) => (
-                                                    <div key={idx} className="group block text-center cursor-default">
-                                                        <div className="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-3 md:mb-4">
-                                                            <div className="absolute inset-0 rounded-full border-2 border-[#B2904D] opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500"></div>
-                                                            <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-gray-100 bg-gray-100 shadow-sm group-hover:shadow-md transition-all">
-                                                                <Image src={person.image} alt={person.name} width={96} height={96} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                                            </div>
-                                                        </div>
-                                                        <div className="text-center px-1">
-                                                            <h5 className="font-bold text-[#002342] text-xs md:text-sm leading-tight group-hover:text-[#B2904D] transition-colors">{person.name}</h5>
-                                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1 block">{gT(person.role)}</span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-
-                                    {/* Managers */}
-                                    {activeOffice.managers.length > 0 && (
-                                        <div>
-                                            <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
-                                                <div className="w-1 h-6 md:h-8 bg-gray-300 rounded-full"></div>
-                                                <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">{t('contact.managersTitle')}</h4>
-                                            </div>
-                                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                                {activeOffice.managers.map((person, idx) => (
-                                                    <div key={idx} className="group block text-center cursor-default">
-                                                        <div className="relative w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4 rounded-full overflow-hidden border-2 border-gray-100 bg-gray-100">
-                                                            <Image src={person.image} alt={person.name} width={80} height={80} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                                        </div>
-                                                        <h5 className="font-bold text-[#002342] text-xs md:text-sm leading-tight">{person.name}</h5>
-                                                        <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1 block">{gT(person.role)}</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                                
-                                {/* 3. FORM */}
-                                <div className="mt-4 pt-4 md:mt-6 md:pt-6 border-t border-gray-100">
-                                    <div className="text-center mb-6">
-                                        <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                                            {t('form.request').split(' ').map((word, index) => (
-                                                <React.Fragment key={index}>
-                                                    {word === 'CONSULTA' ? 
-                                                        <span className="text-[#B2904D]">{word}</span> : word}
-                                                    {' '}
-                                                </React.Fragment>
-                                            ))}
-                                        </h4>
-                                        <p className="text-sm text-gray-600 max-w-xl mx-auto">
-                                            {t('form.callback')}
-                                        </p>
-                                    </div>
-                                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-xl relative">
-                                        <div className="h-2 w-full bg-g radient-to-r from-[#002342] to-[#B2904D]"></div>
-                                        <div className="contact-form-container p-4 md:p-8">
-                                            {/* ContactForm utilizado */}
-                                            <ContactForm />
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </motion.div>
-                    </div>
+            {/* --- HERO SECTION --- */}
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-16 md:mb-24">
+              
+              {/* Texto Hero */}
+              <motion.div 
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#B2904D]/10 border border-[#B2904D]/30 mb-6">
+                  <Sparkles className="text-[#B2904D]" size={14} />
+                  <span className="text-[#B2904D] text-xs font-bold tracking-[0.2em] uppercase">Chicago, Illinois</span>
                 </div>
 
-                {/* VIDEO LIGHTBOX MODAL */}
-                <AnimatePresence>
-                    {isVideoOpen && activeOffice.videoUrl && (
-                        <motion.div 
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4"
-                        >
-                            <button 
-                                onClick={() => setIsVideoOpen(false)}
-                                className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full hover:bg-white/20"
-                            >
-                                <X size={32} />
-                            </button>
-                            
-                            <div className="w-full max-w-6xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/20">
-                                <video 
-                                    controls 
-                                    autoPlay 
-                                    className="w-full h-full"
-                                >
-                                    <source src={activeOffice.videoUrl} type="video/mp4" />
-                                    <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
-                                    {t('contact.videoError')}
-                                </video>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </section>
-        </main>
+                <h1 className="text-4xl md:text-5xl lg:text-7xl font-thin text-white mb-6 leading-tight">
+                  {t(officeData.title)}
+                </h1>
 
-        {/* 3. FOOTER */}
-        <Footer />
-    </div>
+                <div className="w-24 h-1 bg-gradient-to-r from-[#B2904D] to-transparent mb-8" />
+
+                <p className="text-[#B2904D] font-light italic text-lg md:text-xl border-l-2 border-[#B2904D] pl-6 mb-8">
+                  "{t(officeData.quote)}"
+                </p>
+
+                <p className="text-white/70 text-base md:text-lg leading-relaxed font-light max-w-xl">
+                  {t(officeData.description)}
+                </p>
+              </motion.div>
+
+              {/* Video Hero (Chicago tiene video) */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="relative aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(56,189,248,0.15)] group bg-black"
+              >
+                <video 
+                  autoPlay 
+                  muted 
+                  loop 
+                  playsInline 
+                  className="w-full h-full object-cover opacity-80"
+                >
+                  <source src={officeData.videoUrl} type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-[#001540] via-transparent to-transparent opacity-40" />
+                
+                {/* Indicador visual de video */}
+                <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm p-2 rounded-full border border-white/20">
+                    <Play fill="white" size={16} className="text-white" />
+                </div>
+              </motion.div>
+            </div>
+
+            {/* --- INFO GRID --- */}
+            <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 mb-24">
+              
+              {/* Detalles de Contacto y Servicios */}
+              <div className="lg:col-span-5 space-y-8">
+                 <motion.div 
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   className="bg-white/5 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/10"
+                 >
+                   <h3 className="text-2xl font-light text-white mb-8 flex items-center gap-3">
+                     <MapPin className="text-[#B2904D]" /> {t(uiText.address)}
+                   </h3>
+                   
+                   <div className="space-y-6">
+                      {/* Dirección */}
+                      <div className="group">
+                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.address)}</p>
+                        <p className="text-white text-lg leading-snug">{officeData.address}</p>
+                        <a href={officeData.mapLink} target="_blank" className="inline-flex items-center gap-2 text-[#B2904D] mt-3 text-sm font-bold hover:text-[#fff] transition-colors">
+                          {t(uiText.viewMap)} →
+                        </a>
+                      </div>
+                      <div className="h-px bg-white/10" />
+
+                      {/* Teléfono */}
+                      <div>
+                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.phone)}</p>
+                        <a href={`tel:${officeData.phone}`} className="text-2xl text-white font-thin hover:text-[#B2904D] transition-colors">
+                          {officeData.phone}
+                        </a>
+                      </div>
+                      <div className="h-px bg-white/10" />
+
+                      {/* Horario */}
+                      <div>
+                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.hours)}</p>
+                        <div className="flex items-start gap-3">
+                          <Clock className="text-[#B2904D] mt-1 shrink-0" size={18} />
+                          <p className="text-white text-base">{t(officeData.hours)}</p>
+                        </div>
+                      </div>
+                   </div>
+                 </motion.div>
+
+                 {/* Lista de Servicios */}
+                 <motion.div 
+                   initial={{ opacity: 0, y: 20 }}
+                   whileInView={{ opacity: 1, y: 0 }}
+                   viewport={{ once: true }}
+                   transition={{ delay: 0.1 }}
+                   className="p-6 md:p-8 rounded-2xl border border-[#B2904D]/30 bg-gradient-to-br from-[#B2904D]/10 to-transparent"
+                 >
+                   <h3 className="text-xl font-light text-white mb-6 flex items-center gap-2">
+                     <Star className="text-[#B2904D]" fill="#B2904D" size={20} /> {t(uiText.services)}
+                   </h3>
+                   <ul className="grid gap-4">
+                     {officeData.services.map((service, idx) => (
+                       <li key={idx} className="flex items-center gap-3">
+                         <CheckCircle2 className="text-[#B2904D] shrink-0" size={18} />
+                         <span className="text-white/90 text-sm md:text-base font-medium tracking-wide">
+                           {t(service)}
+                         </span>
+                       </li>
+                     ))}
+                   </ul>
+                 </motion.div>
+              </div>
+
+              {/* Grid de Equipo (Gerencia + Abogados) */}
+              <div className="lg:col-span-7 space-y-12">
+                
+                {/* Sección Gerencia */}
+                {officeData.managers.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.2 }}
+                  >
+                    <div className="flex items-center gap-4 mb-8">
+                      <div className="w-1 h-8 bg-white/50 rounded-full" />
+                      <h3 className="text-2xl font-thin text-white">{t(uiText.managers)}</h3>
+                    </div>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                      {officeData.managers.map((person, idx) => (
+                        <div key={idx} className="group text-center bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/30 transition-all duration-300">
+                          <div className="relative w-20 h-20 mx-auto mb-4">
+                            <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-white transition-all duration-500 shadow-lg">
+                              <Image 
+                                src={person.image} 
+                                alt={person.name} 
+                                width={80} 
+                                height={80} 
+                                className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
+                              />
+                            </div>
+                          </div>
+                          <h5 className="font-bold text-white text-sm leading-tight mb-1">
+                            {person.name}
+                          </h5>
+                          <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
+                            {t(person.role)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* Sección Abogados */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <div className="flex items-center gap-4 mb-10">
+                    <div className="w-1 h-10 bg-[#B2904D] rounded-full" />
+                    <h3 className="text-3xl font-thin text-white">{t(uiText.team)}</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                    {officeData.attorneys.map((person, idx) => (
+                      <div key={idx} className="group text-center bg-white/5 rounded-xl p-4 border border-white/5 hover:border-[#B2904D]/30 transition-all duration-300 hover:bg-white/10">
+                        <div className="relative w-24 h-24 mx-auto mb-4">
+                          <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#B2904D] transition-all duration-500 shadow-lg">
+                            <Image 
+                              src={person.image} 
+                              alt={person.name} 
+                              width={96} 
+                              height={96} 
+                              className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
+                            />
+                          </div>
+                        </div>
+                        <h5 className="font-bold text-white text-sm md:text-base leading-tight mb-1 group-hover:text-[#B2904D] transition-colors">
+                          {person.name}
+                        </h5>
+                        <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
+                          {t(person.role)}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+
+            {/* --- FORMULARIO DE CONTACTO --- */}
+            <motion.div 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="relative max-w-4xl mx-auto"
+            >
+              <div className="bg-[#001540]/80 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                <div className="h-1.5 w-full bg-gradient-to-r from-[#B2904D] via-[#D4AF37] to-[#B2904D]" />
+                
+                <div className="p-6 md:p-12">
+                   <ContactForm />
+                </div>
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </>
   );
 }

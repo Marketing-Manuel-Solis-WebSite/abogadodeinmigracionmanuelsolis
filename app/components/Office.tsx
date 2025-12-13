@@ -1,13 +1,22 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { MapPin, Phone, Clock, Star, CheckCircle2, Play, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { MapPin, Phone, Clock, Star, CheckCircle2, Play, X, Sparkles } from 'lucide-react';
 import Image from 'next/image';
-import ContactForm from './ContactForm'; 
-import { useLanguage } from '../context/LanguageContext'; // IMPORTACIÓN REQUERIDA
+import { Outfit } from 'next/font/google';
 
-// --- TIPOS DE DATOS (Adaptados para la traducción) ---
+// ✅ IMPORTACIONES CORRECTAS
+import ContactForm from '../components/ContactForm';
+import { useLanguage } from '../context/LanguageContext';
+
+// --- CONFIGURACIÓN DE FUENTE ---
+const font = Outfit({ 
+  subsets: ['latin'], 
+  weight: ['100', '200', '300', '400', '500', '800', '900'] 
+});
+
+// --- TIPOS DE DATOS ---
 type TeamMember = {
   name: string;
   image: string;
@@ -27,19 +36,21 @@ type OfficeData = {
   hours: { es: string; en: string };
   mapLink: string;
   videoUrl?: string;
+  imageUrl?: string;
   services: { es: string; en: string }[];
   managers: TeamMember[];
   attorneys: TeamMember[];
 };
 
-// --- TEXTOS DE LA INTERFAZ FIJA ---
+// --- TEXTOS ---
 const interfaceTexts = {
   header: {
-    title: { es: 'Nuestras Sedes', en: 'Our Locations' },
+    title: { es: 'Nuestras Oficinas', en: 'Our Locations' },
     subtitle: { 
       es: 'Selecciona una oficina para ver la información detallada, servicios y el equipo legal a tu disposición.', 
       en: 'Select an office to view detailed information, services, and the legal team at your disposal.' 
     },
+    nationalPresence: { es: 'Ubicaciones Físicas', en: 'Physical Locations' }
   },
   contact: {
     address: { es: 'Dirección', en: 'Address' },
@@ -50,21 +61,15 @@ const interfaceTexts = {
     attorneysTitle: { es: 'Nuestros Abogados', en: 'Our Attorneys' },
     managersTitle: { es: 'Nuestra Gerencia', en: 'Our Management Team' },
     videoError: { es: 'Tu navegador no soporta el video.', en: 'Your browser does not support the video.' }
-  },
-  form: {
-    request: { es: 'SOLICITE SU CONSULTA', en: 'REQUEST YOUR CONSULTATION' },
-    callback: { es: 'Llene este formulario y le llamaremos en unos 10 minutos en horas de trabajo.', en: 'Fill out this form, and we will call you back in about 10 minutes during business hours.' }
   }
 };
 
-// --- FUNCIÓN DE AYUDA PARA OBTENER EL TEXTO TRADUCIDO ---
 const getText = (obj: string | { es: string; en: string }, lang: 'es' | 'en'): string => {
   if (typeof obj === 'string') return obj;
-  return obj[lang] || obj.es; // Fallback a español
+  return obj[lang] || obj.es;
 };
 
-
-// --- DATA COMPLETA (Traducida) ---
+// --- DATA COMPLETA ---
 const officesData: OfficeData[] = [
   {
     id: 'houston',
@@ -260,8 +265,8 @@ const officesData: OfficeData[] = [
     title: { es: 'El Paso, TX Oficina', en: 'El Paso, TX Office' },
     quote: { es: 'Bendecidos con la fuerza y la gracia de Dios, e inspirados por nuestro deseo de ayudar.', en: 'Blessed with the strength and grace of God, and inspired by our desire to help.' },
     description: { es: 'Nuestras oficinas en la ciudad de El Paso, Texas, nos permiten tener una presencia estratégica en la frontera para atender de la manera más eficiente y rápida posible a nuestros clientes.', en: 'Our offices in the city of El Paso, Texas, allow us to have a strategic presence on the border to serve our clients in the most efficient and rapid way possible.' },
-    address: '1401 Montana Ave, El Paso, TX 79902',
-    phone: '(915) 209-3389',
+    address: '3632 Admiral St, El Paso, TX 79925',
+    phone: '(915) 233-7127',
     email: 'elpaso@manuelsolis.com',
     hours: { es: 'Lun - Vie 9:00 AM - 6:00 PM', en: 'Mon - Fri 9:00 AM - 6:00 PM' },
     mapLink: 'https://maps.google.com',
@@ -318,7 +323,7 @@ const officesData: OfficeData[] = [
     quote: { es: 'Bendecidos con la fuerza y la gracia de Dios, e inspirados por nuestro deseo de ayudar.', en: 'Blessed with the strength and grace of God, and inspired by our desire to help.' },
     description: { es: 'Nuestra oficina de Bellaire es un satélite de nuestra oficina principal en Houston donde atendemos casos de inmigración en la parte norte de esta gran ciudad. Allí, nuestra letrada Ni Yan, atiende en su lengua materna a clientes provenientes de China en sus casos de inmigración.', en: 'Our Bellaire office is a satellite of our main office in Houston where we handle immigration cases in the northern part of this great city. There, our attorney Ni Yan, serves clients from China in their native language for their immigration cases.' },
     address: '9188 Bellaire Blvd #E, Houston, Texas 77036',
-    phone: '(281) 903-0462',
+    phone: '(713) 903-7875',
     email: 'bellaire@manuelsolis.com',
     hours: { es: 'Lun - Vie 9:00 AM - 7:00 PM | Sáb 8:00 AM - 4:00 PM', en: 'Mon - Fri 9:00 AM - 7:00 PM | Sat 8:00 AM - 4:00 PM' },
     mapLink: 'https://goo.gl/maps/g61U9JLhdEqqvvmv9',
@@ -334,21 +339,180 @@ const officesData: OfficeData[] = [
     attorneys: [
       { name: 'Ni Yan', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-8.png' },
     ]
+  },
+  {
+    id: 'houston',
+    city: 'Houston',
+    state: 'TX',
+    title: { es: 'Houston, TX Oficina', en: 'Houston, TX Office' },
+    quote: { es: 'Más de 34 años de experiencia y 50,000 casos ganados', en: 'Over 34 years of experience and 50,000 cases won' },
+    description: { es: 'El Abogado de Inmigración Manuel Solís le guía en su trámite de visa humanitaria: visa U, visa VAWA, visa T, visa juvenil, permiso de trabajo y residencia permanente en USA. Contamos con representación legal en todo Estados Unidos y también ofrecemos asesoría en áreas legales como derecho familiar, accidentes, negligencia médica, derecho civil y criminal.', en: 'Immigration Attorney Manuel Solís guides you through your humanitarian visa process: U visa, VAWA visa, T visa, juvenile visa, work permit, and permanent residency in the USA. We have legal representation throughout the United States and also offer advice in legal areas such as family law, accidents, medical malpractice, civil and criminal law.' },
+    address: '3730 Kirby Dr Suite 57, Houston, TX 77098',
+    phone: '+1 713-429-0237',
+    email: 'houston@manuelsolis.com',
+    hours: { es: 'Abierto 24 horas', en: 'Open 24 hours' },
+    mapLink: 'https://www.google.com/maps/search/?api=1&query=3730+Kirby+Dr+Suite+57+Houston+TX+77098',
+    imageUrl: '/offices/ofhouston.png',
+    services: [
+      { es: 'VISA U / VISA T / VAWA', en: 'U VISA / T VISA / VAWA' },
+      { es: 'VISA JUVENIL SIJS', en: 'SIJS JUVENILE VISA' },
+      { es: 'RESIDENCIA PERMANENTE', en: 'PERMANENT RESIDENCY' },
+      { es: 'PERMISO DE TRABAJO', en: 'WORK PERMIT' },
+      { es: 'DERECHO FAMILIAR', en: 'FAMILY LAW' }
+    ],
+    managers: [],
+    attorneys: [
+      { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
+      { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
+      { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
+      { name: 'Andrew Fink', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-11.png' },
+      { name: 'Ana Patricia Rueda', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-13.png' },
+      { name: 'Eduardo García', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2025/05/imagen-768x1024.jpeg' },
+    ]
+  },
+  {
+    id: 'memphis-airways',
+    city: 'Memphis Airways',
+    state: 'TN',
+    title: { es: 'Memphis Airways, TN Oficina', en: 'Memphis Airways, TN Office' },
+    quote: { es: 'Contamos con representación legal en todo Estados Unidos', en: 'We have legal representation throughout the United States' },
+    description: { es: 'En el Bufete de Abogados Manuel Solís te guiamos en tu trámite de visa humanitaria, permiso de trabajo, ciudadanía, entre otros. Contamos con representación legal en todo Estados Unidos. Nuestro equipo analiza cada situación de manera detallada, elaborando estrategias legales personalizadas.', en: 'At the Law Office of Manuel Solís, we guide you through your humanitarian visa process, work permit, citizenship, and more. We have legal representation throughout the United States. Our team analyzes each situation in detail, developing personalized legal strategies.' },
+    address: '3385 Airways Blvd Suite 320, Memphis, TN 38116',
+    phone: '+1 901-557-8357',
+    email: 'memphis@manuelsolis.com',
+    hours: { es: 'Lun - Vie 9:00 AM - 6:00 PM | Sáb 9:00 AM - 1:00 PM', en: 'Mon - Fri 9:00 AM - 6:00 PM | Sat 9:00 AM - 1:00 PM' },
+    mapLink: 'https://maps.app.goo.gl/s3zDpAmWvfZQdFt7A',
+    imageUrl: '/offices/ofAirways.png',
+    services: [
+      { es: 'VISA HUMANITARIA', en: 'HUMANITARIAN VISA' },
+      { es: 'PERMISO DE TRABAJO', en: 'WORK PERMIT' },
+      { es: 'CIUDADANÍA', en: 'CITIZENSHIP' },
+      { es: 'DEFENSA DE DEPORTACIÓN', en: 'DEPORTATION DEFENSE' }
+    ],
+    managers: [],
+    attorneys: [
+      { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
+      { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
+      { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
+      { name: 'Andrew Fink', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-11.png' },
+      { name: 'Ana Patricia Rueda', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-13.png' },
+      { name: 'Eduardo García', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2025/05/imagen-768x1024.jpeg' },
+    ]
+  },
+  {
+    id: 'houston-north-loop',
+    city: 'Houston North Loop',
+    state: 'TX',
+    title: { es: 'Houston (North Loop), TX Oficina', en: 'Houston (North Loop), TX Office' },
+    quote: { es: 'Más de 34 años de experiencia y 50,000 casos ganados', en: 'Over 34 years of experience and 50,000 cases won' },
+    description: { es: 'El Abogado de Inmigración Manuel Solís le guía en su trámite de visa humanitaria: visa U, visa VAWA, visa T, visa juvenil, permiso de trabajo y residencia permanente en USA. Contamos con representación legal en todo Estados Unidos.', en: 'Immigration Attorney Manuel Solís guides you through your humanitarian visa process: U visa, VAWA visa, T visa, juvenile visa, work permit, and permanent residency in the USA. We have legal representation throughout the United States.' },
+    address: '2950 N Loop W, Houston, TX 77092',
+    phone: '+1 832-598-0914',
+    email: 'houston@manuelsolis.com',
+    hours: { es: 'Abierto 24 horas', en: 'Open 24 hours' },
+    mapLink: 'https://maps.app.goo.gl/s3zDpAmWvfZQdFt7A',
+    imageUrl: '/offices/ofLoop.png',
+    services: [
+      { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' },
+      { es: 'LEY CRIMINAL', en: 'CRIMINAL LAW' },
+      { es: 'ACCIDENTES', en: 'ACCIDENTS' },
+      { es: 'DERECHO FAMILIAR', en: 'FAMILY LAW' }
+    ],
+    managers: [],
+    attorneys: [
+      { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
+      { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
+      { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
+      { name: 'Andrew Fink', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-11.png' },
+      { name: 'Ana Patricia Rueda', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-13.png' },
+      { name: 'Eduardo García', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2025/05/imagen-768x1024.jpeg' },
+    ]
+  },
+  {
+    id: 'houston-main',
+    city: 'Houston Main St',
+    state: 'TX',
+    title: { es: 'Houston (Main St), TX Oficina', en: 'Houston (Main St), TX Office' },
+    quote: { es: 'Más de 34 años de experiencia y 50,000 casos ganados', en: 'Over 34 years of experience and 50,000 cases won' },
+    description: { es: 'El Abogado de Inmigración Manuel Solís le guía en su trámite de visa humanitaria: visa U, visa VAWA, visa T, visa juvenil, permiso de trabajo y residencia permanente en USA. Contamos con representación legal en todo Estados Unidos.', en: 'Immigration Attorney Manuel Solís guides you through your humanitarian visa process: U visa, VAWA visa, T visa, juvenile visa, work permit, and permanent residency in the USA. We have legal representation throughout the United States.' },
+    address: '708 Main St, Houston, TX 77002',
+    phone: '+1 713-842-9575',
+    email: 'houston@manuelsolis.com',
+    hours: { es: 'Abierto 24 horas', en: 'Open 24 hours' },
+    mapLink: 'https://maps.app.goo.gl/s3zDpAmWvfZQdFt7A',
+    imageUrl: '/offices/main.png',
+    services: [
+      { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' },
+      { es: 'LEY CRIMINAL', en: 'CRIMINAL LAW' },
+      { es: 'ACCIDENTES', en: 'ACCIDENTS' },
+      { es: 'DERECHO FAMILIAR', en: 'FAMILY LAW' }
+    ],
+    managers: [],
+    attorneys: [
+      { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
+      { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
+      { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
+      { name: 'Andrew Fink', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-11.png' },
+      { name: 'Ana Patricia Rueda', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-13.png' },
+      { name: 'Eduardo García', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2025/05/imagen-768x1024.jpeg' },
+    ]
+  },
+  {
+    id: 'houston-northchase',
+    city: 'Houston Northchase',
+    state: 'TX',
+    title: { es: 'Houston (Northchase), TX Oficina', en: 'Houston (Northchase), TX Office' },
+    quote: { es: 'Más de 34 años de experiencia y 50,000 casos ganados', en: 'Over 34 years of experience and 50,000 cases won' },
+    description: { es: 'El Abogado de Inmigración Manuel Solís le guía en su trámite de visa humanitaria: visa U, visa VAWA, visa T, visa juvenil, permiso de trabajo y residencia permanente en USA. Contamos con representación legal en todo Estados Unidos.', en: 'Immigration Attorney Manuel Solís guides you through your humanitarian visa process: U visa, VAWA visa, T visa, juvenile visa, work permit, and permanent residency in the USA. We have legal representation throughout the United States.' },
+    address: '16510 Northchase Dr, Houston, TX 77060',
+    phone: '+1 346-522-4848',
+    email: 'houston@manuelsolis.com',
+    hours: { es: 'Abierto 24 horas', en: 'Open 24 hours' },
+    mapLink: 'https://maps.app.goo.gl/s3zDpAmWvfZQdFt7A',
+    imageUrl: '/offices/ofNorth.png',
+    services: [
+      { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' },
+      { es: 'LEY CRIMINAL', en: 'CRIMINAL LAW' },
+      { es: 'ACCIDENTES', en: 'ACCIDENTS' },
+      { es: 'DERECHO FAMILIAR', en: 'FAMILY LAW' }
+    ],
+    managers: [],
+    attorneys: [
+      { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
+      { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
+      { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
+      { name: 'Andrew Fink', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-11.png' },
+      { name: 'Ana Patricia Rueda', role: { es: 'Abogada', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-13.png' },
+      { name: 'Eduardo García', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2025/05/imagen-768x1024.jpeg' },
+    ]
   }
 ];
 
-
-// --- COMPONENTE PRINCIPAL (Bilingüe) ---
-export default function OfficesBilingual() {
+// --- COMPONENTE PRINCIPAL ---
+export default function OfficesPremium() {
   const { language } = useLanguage(); 
   const lang = language as 'es' | 'en';
   
   const [selectedId, setSelectedId] = useState(officesData[0].id);
   const [activeOffice, setActiveOffice] = useState(officesData[0]);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
-  // Función t (translate) para textos fijos de interfaz
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
+
+  const handleMouseMove = ({ currentTarget, clientX, clientY }: React.MouseEvent) => {
+    requestAnimationFrame(() => {
+      const { left, top, width, height } = currentTarget.getBoundingClientRect();
+      mouseX.set((clientX - left) / width - 0.5);
+      mouseY.set((clientY - top) / height - 0.5);
+    });
+  }
+
+  const cardX = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), { stiffness: 100, damping: 20, mass: 0.5 });
+  const cardY = useSpring(useTransform(mouseY, [-0.5, 0.5], [-5, 5]), { stiffness: 100, damping: 20, mass: 0.5 });
+
   const t = (key: string): string => {
     const parts = key.split('.');
     let current: any = interfaceTexts;
@@ -362,276 +526,410 @@ export default function OfficesBilingual() {
     return current[lang] || current.es;
   };
   
-  // Función gT (getText) para data dinámica
   const gT = (obj: any): string => getText(obj, lang);
-
 
   useEffect(() => {
     const found = officesData.find(o => o.id === selectedId);
     if (found) {
-      setActiveOffice(found);
-      setIsVideoLoaded(false);
+       setActiveOffice(found);
     }
   }, [selectedId]);
 
+  useEffect(() => {
+      if(mainVideoRef.current && activeOffice.videoUrl){
+          mainVideoRef.current.load();
+          const playPromise = mainVideoRef.current.play();
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log("Auto-play prevented");
+            });
+          }
+      }
+  }, [activeOffice]);
+
+  const modalVideoRef = useRef<HTMLVideoElement>(null);
+  
+  useEffect(() => {
+    if (isVideoOpen && activeOffice.videoUrl && modalVideoRef.current) {
+        modalVideoRef.current.load();
+        modalVideoRef.current.play().catch(e => console.error("Error al reproducir video:", e)); 
+    }
+  }, [isVideoOpen, activeOffice.videoUrl]);
+
   return (
-    <section className="w-full bg-white pb-20 overflow-x-hidden" id={lang === 'es' ? 'oficinas' : 'locations'}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section 
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className={`relative w-full min-h-screen bg-[#001540] overflow-hidden ${font.className} -mt-[140px] pt-[160px]`}
+      id={lang === 'es' ? 'oficinas' : 'locations'}
+    >
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
         
-        {/* --- Section Header --- */}
-        <div className="text-center mb-8 pt-8 md:pt-12">
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-blue-600/20 rounded-full blur-[150px]" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+          className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-sky-800/20 rounded-full blur-[180px]" 
+        />
+        
+        <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+      </div>
+
+      <div className="relative z-10 max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-12 pt-8 pb-16 md:pt-12 md:pb-24">
+        
+        <div className="text-center mb-10 md:mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: -30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+            className="inline-flex items-center gap-2 md:gap-3 px-4 md:px-6 py-2 md:py-3 rounded-full bg-transparent/10 backdrop-blur-sm border border-[#B2904D]/30 mb-6 md:mb-8"
+          >
+            <Sparkles className="text-[#B2904D]" size={16} />
+            <span className="text-white/70 text-xs md:text-sm font-light tracking-[0.2em] uppercase">{t('header.nationalPresence')}</span>
+          </motion.div>
+
           <motion.h2 
             initial={{ opacity: 0, y: -20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-3xl md:text-5xl font-serif font-bold text-[#002342] mb-3"
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.2 }}
+            className="text-4xl md:text-6xl lg:text-8xl font-thin text-white mb-4 md:mb-6 tracking-tight px-4"
           >
             {t('header.title')}
           </motion.h2>
-          <div className="w-24 h-1 bg-[#B2904D] mx-auto rounded-full mb-6"></div>
-          <p className="text-gray-500 max-w-xl mx-auto text-sm md:text-base">
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.5 }}
+            className="w-24 md:w-32 h-[2px] bg-gradient-to-r from-transparent via-[#B2904D] to-transparent mx-auto mb-6 md:mb-8"
+          />
+
+          <motion.p 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, delay: 0.6 }}
+            className="text-white/60 max-w-2xl mx-auto text-sm md:text-base lg:text-lg font-light leading-relaxed px-4"
+          >
             {t('header.subtitle')}
-          </p>
+          </motion.p>
         </div>
 
-        {/* --- Main Layout (Grid) --- */}
-        <div className="grid lg:grid-cols-12 gap-6 lg:gap-8 min-h-[800px]">
+        <div className="grid lg:grid-cols-12 gap-6 md:gap-8 lg:gap-12">
           
-          {/* --- 1. Navigation Column (Premium Sidebar Style) --- */}
-          <div className="lg:col-span-3">
-            <div className="sticky top-24">
+          <motion.div 
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8 }}
+            className="lg:col-span-3"
+          >
+            <div className="relative bg-[#001540]/90 backdrop-blur-sm rounded-xl p-3 md:p-4 border border-white/10 shadow-[0_0_40px_rgba(56,189,248,0.15)]">
               
-              {/* --- VERTICAL OFFICE LIST (2 COLUMN GRID ON MOBILE) --- */}
               <div className="grid grid-cols-2 gap-2 lg:flex lg:flex-col lg:gap-3">
-                  {officesData.map((office) => (
-                    <button
-                      key={office.id}
-                      onClick={() => setSelectedId(office.id)}
-                      className={`
-                        w-full relative group px-3 py-3 md:px-5 md:py-4 rounded-lg text-left transition-all duration-300
-                        flex items-center justify-between
-                        ${selectedId === office.id 
-                          ? 'bg-[#002342] text-white shadow-xl border-l-4 border-[#B2904D]' 
-                          : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                        }
-                      `}
-                    >
-                      <div className="overflow-hidden">
-                        <span className={`block font-serif font-bold text-sm md:text-lg leading-tight truncate ${selectedId === office.id ? 'text-white' : 'text-[#002342]'}`}>
+                {officesData.map((office) => (
+                  <motion.button
+                    key={office.id}
+                    onClick={() => setSelectedId(office.id)}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className={`
+                      relative group px-3 py-3 md:px-4 md:py-4 rounded-xl text-left transition-all duration-300
+                      ${selectedId === office.id 
+                        ? 'bg-gradient-to-br from-[#B2904D]/30 to-[#B2904D]/10 border-2 border-[#B2904D] shadow-[0_0_20px_rgba(178,144,77,0.4)]' 
+                        : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-[#B2904D]/30 hover:shadow-[0_0_15px_rgba(56,189,248,0.2)]'
+                      }
+                    `}
+                  >
+                    <div className="relative z-10 flex items-center justify-between">
+                      <div className="overflow-hidden flex-1 min-w-0">
+                        <span className={`block font-bold text-xs md:text-sm lg:text-base leading-tight truncate transition-colors duration-300 ${selectedId === office.id ? 'text-white' : 'text-white/80 group-hover:text-white'}`}>
                           {office.city}
                         </span>
-                        <span className={`text-[9px] md:text-[10px] uppercase tracking-widest mt-1 block ${selectedId === office.id ? 'text-[#B2904D]' : 'text-gray-400'}`}>
+                        <span className={`text-[9px] md:text-[10px] uppercase tracking-[0.15em] mt-1 block font-medium transition-colors duration-300 ${selectedId === office.id ? 'text-[#B2904D]' : 'text-white/40 group-hover:text-white/60'}`}>
                           {office.state}
                         </span>
                       </div>
                       
                       {selectedId === office.id && (
-                          <motion.div layoutId="activeIndicator" className="text-[#B2904D] hidden lg:block">
-                            <Star fill="#B2904D" size={16} />
-                          </motion.div>
+                        <motion.div 
+                          layoutId="activeIndicator" 
+                          className="hidden md:block ml-2"
+                          transition={{ type: "spring", bounce: 0.4, duration: 0.6 }}
+                        >
+                          <Star fill="#B2904D" className="text-[#B2904D]" size={16} />
+                        </motion.div>
                       )}
-                    </button>
-                  ))}
-                </div>
+                    </div>
+                  </motion.button>
+                ))}
+              </div>
             </div>
-          </div>
+          </motion.div>
 
-          {/* --- 2. Content Column (Main Card) --- */}
           <div className="lg:col-span-9">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeOffice.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}
-                className="bg-white rounded-2xl md:rounded-3xl shadow-lg md:shadow-2xl border border-gray-100 overflow-hidden flex flex-col h-full"
+                style={{ x: cardX, y: cardY }}
+                initial={{ opacity: 0, scale: 0.98 }} 
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: "easeOut" }} 
+                className="relative"
               >
-                
-                {/* A. Hero Area (Video/Image) */}
-                <div className="relative h-[250px] md:h-[450px] w-full bg-[#002342] overflow-hidden group">
+                <div className="relative bg-[#001540]/90 backdrop-blur-sm rounded-xl md:rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(56,189,248,0.2)]">
+                  
+                  <div className="relative h-[280px] md:h-[400px] lg:h-[500px] w-full overflow-hidden group bg-black">
                     
-                    {/* Video Background */}
                     {activeOffice.videoUrl ? (
-                          <video 
-                            autoPlay muted loop playsInline
-                            onLoadedData={() => setIsVideoLoaded(true)}
-                            className={`absolute inset-0 w-full h-full object-cover scale-110 transition-opacity duration-1000 ${isVideoLoaded ? 'opacity-70' : 'opacity-0'}`} 
-                          >
-                            <source src={activeOffice.videoUrl} type="video/mp4" />
-                            <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
-                        </video>
+                      <video 
+                        ref={mainVideoRef}
+                        autoPlay 
+                        muted 
+                        loop 
+                        playsInline
+                        preload="auto"
+                        className="absolute inset-0 w-full h-full object-cover" 
+                      >
+                        <source src={activeOffice.videoUrl} type="video/mp4" />
+                        <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
+                      </video>
+                    ) : activeOffice.imageUrl ? (
+                      <div className="relative w-full h-full">
+                        <Image 
+                          src={activeOffice.imageUrl}
+                          alt={`${activeOffice.city} Office`}
+                          fill
+                          className="object-cover"
+                          priority
+                        />
+                      </div>
                     ) : (
-                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10" />
+                      <div className="absolute inset-0 bg-gradient-to-br from-[#002868] to-[#001540]" />
                     )}
-
-                    {/* Overlay Gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#002342] via-transparent to-transparent opacity-90 md:opacity-80" />
                     
-                    {/* Play Button (Simplified for mobile) */}
+                    <div className="absolute bottom-0 left-0 w-full h-2/3 bg-gradient-to-t from-[#001540] via-[#001540]/60 to-transparent" />
+
                     {activeOffice.videoUrl && (
-                      <div className="absolute top-3 right-3 md:top-6 md:right-6 z-30">
-                        <button 
+                      <motion.div 
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring", bounce: 0.5 }} 
+                        className="absolute top-4 right-4 md:top-6 md:right-6 z-30"
+                      >
+                        <motion.button 
                           onClick={() => setIsVideoOpen(true)}
-                          className="flex items-center justify-center bg-white/20 backdrop-blur-md border border-white/30 h-10 w-10 md:h-12 md:w-12 rounded-full hover:bg-[#B2904D] transition-colors"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="relative flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/20 transition-colors"
                         >
                           <Play size={20} fill="white" className="text-white" />
-                        </button>
-                      </div>
+                        </motion.button>
+                      </motion.div>
                     )}
 
-                    {/* Bottom Hero Text */}
-                    <div className="absolute bottom-0 left-0 w-full p-5 md:p-12 text-white z-10">
-                          <motion.div 
-                            initial={{ opacity: 0, y: 10 }} 
-                            animate={{ opacity: 1, y: 0 }} 
-                            transition={{ delay: 0.2 }}
-                          >
-                             <div className="flex flex-wrap items-center gap-2 mb-2">
-                                 <span className="bg-[#B2904D] text-white text-[10px] md:text-xs font-bold px-2 py-1 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md">
-                                     <MapPin size={10} /> {activeOffice.city}, {activeOffice.state}
-                                 </span>
-                              </div>
-                              <h3 className="text-2xl md:text-5xl font-serif font-bold mb-1 md:mb-3 leading-tight text-white">
-                                  {gT(activeOffice.title)}
-                              </h3>
-                              <p className="text-[#B2904D] font-medium italic text-sm md:text-xl max-w-3xl line-clamp-2 md:line-clamp-none">
-                                  "{gT(activeOffice.quote)}"
-                              </p>
-                          </motion.div>
-                    </div>
-                </div>
+                    <div className="absolute bottom-0 left-0 w-full p-4 md:p-8 lg:p-12 text-white z-20">
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        transition={{ duration: 0.5 }} 
+                      >
+                        <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-3 md:mb-4">
+                          <span className="px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[10px] md:text-xs font-bold uppercase tracking-wider bg-[#B2904D]/90 backdrop-blur-sm text-white border border-[#B2904D]">
+                            <MapPin size={10} className="inline mr-1" /> {activeOffice.city}, {activeOffice.state}
+                          </span>
+                        </div>
 
-                {/* B. Content Body */}
-                <div className="p-5 md:p-12 space-y-8 md:space-y-12">
+                        <h3 className="text-2xl md:text-4xl lg:text-6xl font-thin mb-2 md:mb-3 leading-[1.1] text-white drop-shadow-lg">
+                          {gT(activeOffice.title)}
+                        </h3>
+
+                        <p className="text-[#B2904D] font-light italic text-xs md:text-base lg:text-xl max-w-3xl leading-relaxed pl-3 md:pl-4 border-l-2 border-[#B2904D] line-clamp-2 md:line-clamp-none">
+                          "{gT(activeOffice.quote)}"
+                        </p>
+                      </motion.div>
+                    </div>
+                  </div>
+
+                  <div className="p-4 md:p-8 lg:p-12 space-y-8 md:space-y-12">
                     
-                    {/* 1. Description and Services */}
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12">
-                        <div>
-                            <p className="text-gray-600 text-sm md:text-lg leading-relaxed mb-6 md:mb-8 text-justify">
-                                {gT(activeOffice.description)}
-                            </p>
-                            
-                            {/* Contact Grid */}
-                            <div className="space-y-3 md:space-y-4 bg-gray-50 p-4 rounded-xl md:bg-transparent md:p-0">
-                                <div className="flex items-start gap-3 md:gap-4">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><MapPin size={16}/></div>
-                                    <div>
-                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.address')}</p>
-                                        <p className="text-[#002342] font-medium text-sm md:text-base">{activeOffice.address}</p>
-                                        <a href={activeOffice.mapLink} target="_blank" className="text-[#B2904D] text-xs font-bold hover:underline mt-1 inline-block">{t('contact.viewOnMap')}</a>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 md:gap-4">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Phone size={16}/></div>
-                                    <div>
-                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.phone')}</p>
-                                        <a href={`tel:${activeOffice.phone}`} className="text-[#002342] font-bold hover:text-[#B2904D] text-sm md:text-base">{activeOffice.phone}</a>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 md:gap-4">
-                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-white md:bg-gray-50 border border-gray-100 md:border-0 flex items-center justify-center text-[#002342] shrink-0"><Clock size={16}/></div>
-                                    <div>
-                                        <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase">{t('contact.hours')}</p>
-                                        <p className="text-[#002342] font-medium text-sm md:text-base">{gT(activeOffice.hours)}</p>
-                                    </div>
-                                </div>
+                      
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 }} 
+                      >
+                        <p className="text-white/70 text-sm md:text-base lg:text-lg leading-relaxed mb-6 md:mb-8 font-light">
+                          {gT(activeOffice.description)}
+                        </p>
+                        
+                        <div className="space-y-4 md:space-y-6">
+                          <div className="flex items-start gap-3 md:gap-4 group">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#B2904D] flex-shrink-0">
+                              <MapPin size={18}/>
                             </div>
-                        </div>
-
-                        {/* Services List */}
-                        <div className="bg-gray-50 rounded-xl p-5 md:p-8 border border-gray-100">
-                            <h4 className="text-lg md:text-xl font-serif font-bold text-[#002342] mb-4 md:mb-6 flex items-center gap-2">
-                                <Star className="text-[#B2904D]" size={18} fill="#B2904D" /> {t('contact.servicesTitle')}
-                            </h4>
-                            <ul className="space-y-2 md:space-y-4">
-                                {activeOffice.services.map((service, idx) => (
-                                    <li key={idx} className="flex items-center gap-2 md:gap-3">
-                                        <CheckCircle2 className="text-[#B2904D] shrink-0" size={16} />
-                                        <span className="text-[#002342] font-bold text-xs md:text-sm tracking-wide">{gT(service)}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div className="w-full h-px bg-gray-100" />
-
-                    {/* 2. Team */}
-                    <div>
-                        {/* Attorneys */}
-                        {activeOffice.attorneys.length > 0 && (
-                            <div className="mb-8 md:mb-12">
-                                <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
-                                    <div className="w-1 h-6 md:h-8 bg-[#B2904D] rounded-full"></div>
-                                    <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">{t('contact.attorneysTitle')}</h4>
-                                </div>
-                                {/* Responsive Grid: 2 columns on mobile, 4 on desktop */}
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                    {activeOffice.attorneys.map((person, idx) => (
-                                        // 🛑 NO LINK COMPONENT USED HERE
-                                        <div key={idx} className="group block text-center cursor-default">
-                                            <div className="relative w-20 h-20 md:w-24 md:h-24 mx-auto mb-3 md:mb-4">
-                                                <div className="absolute inset-0 rounded-full border-2 border-[#B2904D] opacity-0 scale-110 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500"></div>
-                                                <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-gray-100 bg-gray-100 shadow-sm group-hover:shadow-md transition-all">
-                                                    <Image src={person.image} alt={person.name} width={96} height={96} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                                </div>
-                                            </div>
-                                            <div className="text-center px-1">
-                                                <h5 className="font-bold text-[#002342] text-xs md:text-sm leading-tight group-hover:text-[#B2904D] transition-colors">{person.name}</h5>
-                                                <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1 block">{gT(person.role)}</span>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[10px] md:text-[11px] text-white/40 font-bold uppercase tracking-wider mb-1">{t('contact.address')}</p>
+                              <p className="text-white font-medium text-xs md:text-sm lg:text-base leading-snug break-words">{activeOffice.address}</p>
+                              <a 
+                                href={activeOffice.mapLink} 
+                                target="_blank" 
+                                className="inline-flex items-center gap-1 text-[#B2904D] text-xs font-bold hover:text-[#D4AF37] mt-2"
+                              >
+                                {t('contact.viewOnMap')} →
+                              </a>
                             </div>
-                        )}
+                          </div>
 
-                        {/* Managers */}
-                        {activeOffice.managers.length > 0 && (
+                          <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#B2904D] flex-shrink-0">
+                              <Phone size={18}/>
+                            </div>
                             <div>
-                                <div className="flex items-center gap-2 md:gap-3 mb-6 md:mb-8">
-                                    <div className="w-1 h-6 md:h-8 bg-gray-300 rounded-full"></div>
-                                    <h4 className="text-xl md:text-2xl font-serif font-bold text-[#002342]">{t('contact.managersTitle')}</h4>
-                                </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-                                    {activeOffice.managers.map((person, idx) => (
-                                        <div key={idx} className="group block text-center cursor-default">
-                                            <div className="relative w-16 h-16 md:w-20 md:h-20 mx-auto mb-3 md:mb-4 rounded-full overflow-hidden border-2 border-gray-100 bg-gray-100">
-                                                <Image src={person.image} alt={person.name} width={80} height={80} className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" />
-                                            </div>
-                                            <h5 className="font-bold text-[#002342] text-xs md:text-sm leading-tight">{person.name}</h5>
-                                            <span className="text-[9px] md:text-[10px] font-bold uppercase tracking-widest text-gray-400 mt-1 block">{gT(person.role)}</span>
-                                        </div>
-                                    ))}
-                                </div>
+                              <p className="text-[10px] md:text-[11px] text-white/40 font-bold uppercase tracking-wider mb-1">{t('contact.phone')}</p>
+                              <a href={`tel:${activeOffice.phone}`} className="text-white font-bold hover:text-[#B2904D] text-sm md:text-base lg:text-lg transition-colors">
+                                {activeOffice.phone}
+                              </a>
                             </div>
-                        )}
-                    </div>
-                    
-                    {/* 3. FORM */}
-                    <div className="mt-4 pt-4 md:mt-6 md:pt-6 border-t border-gray-100">
-                        <div className="text-center mb-6">
-                            <h4 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                                {t('form.request').split(' ').map((word, index) => (
-                                    <React.Fragment key={index}>
-                                        {word === 'CONSULTATION' || word === 'CONSULTA' ? 
-                                            <span className="text-[#B2904D]">{word}</span> : word}
-                                        {' '}
-                                    </React.Fragment>
-                                ))}
-                            </h4>
-                            <p className="text-sm text-gray-600 max-w-xl mx-auto">
-                                {t('form.callback')}
-                            </p>
-                        </div>
-                        <div className="bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-xl relative">
-                            <div className="h-2 w-full bg-g radient-to-r from-[#002342] to-[#B2904D]"></div>
-                            <div className="contact-form-container">
-                                 <ContactForm />
+                          </div>
+
+                          <div className="flex items-center gap-3 md:gap-4">
+                            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#B2904D] flex-shrink-0">
+                              <Clock size={18}/>
                             </div>
+                            <div>
+                              <p className="text-[10px] md:text-[11px] text-white/40 font-bold uppercase tracking-wider mb-1">{t('contact.hours')}</p>
+                              <p className="text-white font-medium text-xs md:text-sm lg:text-base">{gT(activeOffice.hours)}</p>
+                            </div>
+                          </div>
                         </div>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }} 
+                      >
+                        <div className="p-5 md:p-6 lg:p-8 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                          <h4 className="text-lg md:text-xl lg:text-2xl font-light text-white mb-5 md:mb-6 flex items-center gap-2 md:gap-3">
+                            <Star className="text-[#B2904D] flex-shrink-0" size={20} fill="#B2904D" /> 
+                            <span className="truncate">{t('contact.servicesTitle')}</span>
+                          </h4>
+                          <ul className="space-y-3 md:space-y-4">
+                            {activeOffice.services.map((service, idx) => (
+                              <li key={idx} className="flex items-center gap-2 md:gap-3">
+                                <CheckCircle2 className="text-[#B2904D] flex-shrink-0" size={16} />
+                                <span className="text-white/80 font-medium text-xs md:text-sm lg:text-base tracking-wide">
+                                  {gT(service)}
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </motion.div>
                     </div>
 
+                    <div className="relative h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
+                    <div>
+                      {activeOffice.attorneys.length > 0 && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: 10 }} 
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.3 }} 
+                          className="mb-12 md:mb-16"
+                        >
+                          <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                            <div className="w-1 h-8 md:h-10 bg-gradient-to-b from-[#B2904D] to-transparent rounded-full" />
+                            <h4 className="text-xl md:text-2xl lg:text-3xl font-light text-white">{t('contact.attorneysTitle')}</h4>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                            {activeOffice.attorneys.map((person, idx) => (
+                              <div key={idx} className="group text-center">
+                                <div className="relative w-20 h-20 md:w-24 md:h-24 lg:w-28 lg:h-28 mx-auto mb-3 md:mb-4">
+                                  <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#B2904D]/50 transition-all duration-500 bg-white/5 shadow-[0_0_20px_rgba(56,189,248,0.2)]">
+                                    <Image 
+                                      src={person.image} 
+                                      alt={person.name} 
+                                      width={112} 
+                                      height={112} 
+                                      className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
+                                    />
+                                  </div>
+                                </div>
+
+                                <h5 className="font-bold text-white text-xs md:text-sm lg:text-base leading-tight group-hover:text-[#B2904D] transition-colors px-1">
+                                  {person.name}
+                                </h5>
+                                <span className="text-[9px] md:text-[10px] lg:text-xs font-medium uppercase tracking-wider text-white/40 mt-1 block">
+                                  {gT(person.role)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+
+                      {activeOffice.managers.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }} 
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.4 }} 
+                        >
+                          <div className="flex items-center gap-3 md:gap-4 mb-6 md:mb-10">
+                            <div className="w-1 h-8 md:h-10 bg-gradient-to-b from-white/30 to-transparent rounded-full" />
+                            <h4 className="text-xl md:text-2xl lg:text-3xl font-light text-white">{t('contact.managersTitle')}</h4>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                            {activeOffice.managers.map((person, idx) => (
+                              <div key={idx} className="group text-center">
+                                <div className="relative w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 mx-auto mb-3 md:mb-4 rounded-full overflow-hidden border-2 border-white/10 group-hover:border-white/30 transition-all duration-500 bg-white/5">
+                                  <Image 
+                                    src={person.image} 
+                                    alt={person.name} 
+                                    width={96} 
+                                    height={96} 
+                                    className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
+                                  />
+                                </div>
+                                <h5 className="font-bold text-white text-xs md:text-sm lg:text-base leading-tight px-1">{person.name}</h5>
+                                <span className="text-[9px] md:text-[10px] lg:text-xs font-medium uppercase tracking-wider text-white/40 mt-1 block">
+                                  {gT(person.role)}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.5 }} 
+                      className="pt-8 md:pt-12 border-t border-white/10"
+                    >
+                      <div className="relative bg-[#001540]/80 backdrop-blur-sm rounded-lg md:rounded-xl border border-white/10 overflow-hidden">
+                        <div className="h-1 w-full bg-gradient-to-r from-[#B2904D] via-[#D4AF37] to-[#B2904D]" />
+                        <div className="p-4 md:p-6 lg:p-8">
+                          <ContactForm />
+                        </div>
+                      </div>
+                    </motion.div>
+
+                  </div>
                 </div>
               </motion.div>
             </AnimatePresence>
@@ -639,33 +937,38 @@ export default function OfficesBilingual() {
         </div>
       </div>
 
-      {/* VIDEO LIGHTBOX MODAL */}
       <AnimatePresence>
         {isVideoOpen && activeOffice.videoUrl && (
           <motion.div 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 backdrop-blur-xl p-3 md:p-4"
+            onClick={() => setIsVideoOpen(false)}
           >
-            <button 
+            <motion.button 
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
               onClick={() => setIsVideoOpen(false)}
-              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors p-2 bg-white/10 rounded-full hover:bg-white/20"
+              className="absolute top-4 right-4 md:top-8 md:right-8 text-white/70 hover:text-white transition-colors p-2 md:p-3 bg-white/10 rounded-full hover:bg-white/20 backdrop-blur-sm z-50"
             >
-              <X size={32} />
-            </button>
+              <X size={24} />
+            </motion.button>
             
-            <div className="w-full max-w-6xl aspect-video bg-black rounded-xl overflow-hidden shadow-2xl relative ring-1 ring-white/20">
-               <video 
-                  controls 
-                  autoPlay 
-                  className="w-full h-full"
-               >
+            <motion.div 
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              className="w-full max-w-6xl aspect-video relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative w-full h-full bg-black rounded-xl overflow-hidden shadow-2xl shadow-blue-900/20">
+                <video ref={modalVideoRef} controls autoPlay className="w-full h-full">
                   <source src={activeOffice.videoUrl} type="video/mp4" />
                   <source src={activeOffice.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
                   {t('contact.videoError')}
-               </video>
-            </div>
+                </video>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

@@ -11,6 +11,13 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'manuelsolis.com',
       },
+      // Nuevo dominio de Vercel Blob agregado para corregir el error
+      {
+        protocol: 'https',
+        hostname: '3cbymunqi03dlsyk.public.blob.vercel-storage.com',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   // Configuración para i18n
