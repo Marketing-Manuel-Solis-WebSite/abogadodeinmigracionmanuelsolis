@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
 import { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
+import { track } from '@vercel/analytics/react'; // 1. Importar track de Vercel
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -22,7 +23,13 @@ export default function WhatsAppButton() {
   const handleClick = () => {
     window.open(whatsappUrl, '_blank');
     
-    // Analytics tracking (opcional)
+    // 2. Vercel Analytics Tracking (NUEVO)
+    track('Whatsapp Click', {
+      location: 'floating_button',
+      timestamp: new Date().toISOString()
+    });
+
+    // 3. Google Analytics Tracking (EXISTENTE)
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'whatsapp_click', {
         'event_category': 'contact',

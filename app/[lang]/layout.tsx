@@ -17,40 +17,99 @@ type Props = {
   children: React.ReactNode;
 };
 
+const SITE_URL = 'https://www.manuelsolis.com';
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LawFirm',
+  name: 'Manuel Solis Law Firm',
+  alternateName: 'Abogados Manuel Solis',
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo-manuel-solis.png`,
+  sameAs: [
+    'https://www.facebook.com/AbogadoManuelSolisOficial/',
+    'https://twitter.com/AbogadoMSolis',
+    'https://www.linkedin.com/company/manuel-solis-law-firm/',
+    'https://www.instagram.com/abogadomanuelsolisoficial/',
+    'https://www.youtube.com/channel/UCWD61mNBq6qJ0BMhj_-a4Vg'
+  ],
+  contactPoint: {
+    '@type': 'ContactPoint',
+    telephone: '+1-866-979-5146',
+    contactType: 'customer service',
+    areaServed: 'US', // Audiencia principal: Estados Unidos
+    availableLanguage: ['English', 'Spanish']
+  }
+};
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { lang } = await params;
   const currentLang = (lang === 'es' || lang === 'en') ? (lang as Language) : 'es';
   const t = translations[currentLang];
   
-  const baseUrl = 'https://manuelsolis.com';
+  const localeSEO = currentLang === 'es' ? 'es-US' : 'en-US';
+
+  const keywordList = typeof t.seo.home.keywords === 'string' 
+    ? t.seo.home.keywords.split(',').map(k => k.trim()) 
+    : t.seo.home.keywords;
 
   return {
-    title: t.seo.home.title,
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: t.seo.home.title,
+      template: `%s | Manuel Solis Law Firm`
+    },
     description: t.seo.home.description,
-    keywords: t.seo.home.keywords,
-    authors: [{ name: 'Manuel Solis Law Offices' }],
+    keywords: [
+      ...keywordList,
+      "Abogado de Inmigración USA",
+      "Immigration Lawyer USA",
+      "Defensa Criminal",
+      "Accidentes de Auto"
+    ],
+    authors: [{ name: 'Manuel Solis Law Firm' }],
+    creator: 'Manuel Solis',
+    publisher: 'Manuel Solis Law Firm',
+    
+    icons: {
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      ],
+      apple: '/apple-touch-icon.png',
+      other: [
+        { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#009b3a' },
+        { rel: 'manifest', url: '/site.webmanifest' },
+      ],
+    },
+    
+    themeColor: '#051120',
+    
     openGraph: {
       title: t.seo.home.title,
       description: t.seo.home.description,
-      url: baseUrl,
-      siteName: 'Manuel Solis',
-      locale: currentLang === 'es' ? 'es_MX' : 'en_US',
+      url: `${SITE_URL}/${currentLang}`,
+      siteName: 'Manuel Solis Law Firm',
+      locale: localeSEO,
       type: 'website',
       images: [
         {
-          url: `${baseUrl}/og-image.jpg`,
+          url: `/og-image.jpg`,
           width: 1200,
           height: 630,
-          alt: t.seo.home.title,
+          alt: 'Manuel Solis Law Firm - Inmigración y Accidentes',
         },
       ],
     },
+    
     twitter: {
       card: 'summary_large_image',
       title: t.seo.home.title,
       description: t.seo.home.description,
-      images: [`${baseUrl}/og-image.jpg`],
+      creator: '@manuelsolis',
+      images: [`/og-image.jpg`],
     },
+    
     robots: {
       index: true,
       follow: true,
@@ -62,16 +121,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'max-snippet': -1,
       },
     },
+    
     alternates: {
-      canonical: `${baseUrl}/${currentLang}`,
+      canonical: `${SITE_URL}/${currentLang}`,
       languages: {
-        'es-MX': `${baseUrl}/es`,
-        'en-US': `${baseUrl}/en`,
+        'es-US': `${SITE_URL}/es`, // SEO Targeting específico para hispanos en USA
+        'en-US': `${SITE_URL}/en`,
+        'x-default': `${SITE_URL}/es`, // Fallback por defecto
       },
-    },
-    other: {
-      'og:site_name': 'Manuel Solis',
-      'article:publisher': 'https://www.facebook.com/manuelsolis',
     },
   };
 }
@@ -79,87 +136,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function LangLayout({ children, params }: Props) {
   const { lang } = await params;
   const currentLang = (lang === 'es' || lang === 'en') ? (lang as Language) : 'es';
-  const t = translations[currentLang];
   
-  const schemaData = {
-    '@context': 'https://schema.org',
-    '@type': 'LegalService',
-    name: 'Law Offices of Manuel Solis',
-    alternateName: 'Manuel Solis',
-    description: t.seo.home.description,
-    url: 'https://manuelsolis.com',
-    telephone: '+1-866-979-5146',
-    priceRange: '$$',
-    address: {
-      '@type': 'PostalAddress',
-      addressCountry: 'US',
-    },
-    geo: {
-      '@type': 'GeoCoordinates',
-      latitude: '29.7604',
-      longitude: '-95.3698',
-    },
-    areaServed: ['US', 'MX'],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.9',
-      reviewCount: '500',
-    },
-    sameAs: [
-      'https://facebook.com/manuelsolis',
-      'https://twitter.com/manuelsolis',
-      'https://linkedin.com/company/manuelsolis',
-      'https://instagram.com/manuelsolis',
-    ],
-    hasOfferCatalog: {
-      '@type': 'OfferCatalog',
-      name: 'Legal Services',
-      itemListElement: [
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Immigration Law',
-            description: 'Immigration legal services',
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Personal Injury',
-            description: 'Accident and injury cases',
-          },
-        },
-        {
-          '@type': 'Offer',
-          itemOffered: {
-            '@type': 'Service',
-            name: 'Criminal Law',
-            description: 'Criminal defense services',
-          },
-        },
-      ],
-    },
-    parentOrganization: {
-      '@type': 'LegalService',
-      name: 'Manuel Solis',
-      url: 'https://manuelsolis.com',
-    },
-  };
+  // HTML Lang attribute corregido para targeting
+  const htmlLang = currentLang === 'es' ? 'es-US' : 'en-US';
   
   return (
-    <html lang={currentLang} suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
-        {/* 1. SCHEMA ORG */}
+        {/* 1. SCHEMA ORG GLOBAL - ORGANIZATION ENTITY */}
         <Script
-          id="schema-org"
+          id="schema-org-global"
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
           strategy="beforeInteractive"
         />
         
-        {/* 2. GOOGLE ANALYTICS (GA4) - ID REAL IMPLEMENTADO */}
+        {/* 2. GOOGLE ANALYTICS (GA4) */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-V5F8J8QMZ4"
@@ -178,7 +170,7 @@ export default async function LangLayout({ children, params }: Props) {
           }}
         />
 
-        {/* 3. META PIXEL (Facebook & Instagram) - ID REAL IMPLEMENTADO */}
+        {/* 3. META PIXEL */}
         <Script
           id="meta-pixel"
           strategy="afterInteractive"
@@ -198,7 +190,7 @@ export default async function LangLayout({ children, params }: Props) {
           }}
         />
 
-        {/* 4. TIKTOK PIXEL - ID REAL IMPLEMENTADO */}
+        {/* 4. TIKTOK PIXEL */}
         <Script
           id="tiktok-pixel"
           strategy="afterInteractive"
@@ -216,7 +208,6 @@ export default async function LangLayout({ children, params }: Props) {
       </head>
       
       <body suppressHydrationWarning>
-        {/* Fallback para Meta Pixel (si el usuario no tiene JS) */}
         <noscript>
           <img 
             height="1" 
@@ -232,7 +223,6 @@ export default async function LangLayout({ children, params }: Props) {
           <WhatsAppButton />
           <AIChatButton />
           
-          {/* Herramientas de Vercel */}
           <Analytics />
           <SpeedInsights />
           

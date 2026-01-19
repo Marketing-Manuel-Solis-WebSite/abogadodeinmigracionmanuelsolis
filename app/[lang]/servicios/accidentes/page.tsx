@@ -24,7 +24,7 @@ import {
 import Image from 'next/image';
 import { Outfit } from 'next/font/google';
 
-// --- IMPORTACIONES DE COMPONENTES (RUTAS CORREGIDAS) ---
+// --- IMPORTACIONES DE COMPONENTES ---
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
 import ContactForm from '../../../components/ContactForm';
@@ -111,7 +111,7 @@ const texts = {
       position: "col-span-3 lg:col-span-1 h-[450px]",
       content: {
         intro: { es: "¿Herido por negligencia médica o por un producto farmacéutico?", en: "Injured due to medical malpractice or a pharmaceutical product?" },
-        description: { es: "A veces, una mala experiencia debida a una enfermedad o un accidente puede ser aun peor si no recibimos un trato profesional por parte del médico o el hospital que supuestamente debe ayudarnos. Podría ser que incluso usted sospeche que el fallecimiento de un ser querido posiblemente se deba a una mala decisión.", in: "Sometimes, a bad experience due to illness or accident can be even worse if we do not receive professional treatment from the doctor or hospital that is supposed to help us. You might even suspect that the death of a loved one is possibly due to a bad decision." },
+        description: { es: "A veces, una mala experiencia debida a una enfermedad o un accidente puede ser aun peor si no recibimos un trato profesional por parte del médico o el hospital que supuestamente debe ayudarnos. Podría ser que incluso usted sospeche que el fallecimiento de un ser querido posiblemente se deba a una mala decisión.", en: "Sometimes, a bad experience due to illness or accident can be even worse if we do not receive professional treatment from the doctor or hospital that is supposed to help us. You might even suspect that the death of a loved one is possibly due to a bad decision." },
         solution: { es: "Si usted cree que usted o un ser querido no ha recibido un trato profesional y ha sufrido daños, podemos estudiar su caso para saber si tiene derecho a reclamar una indemnización por su sufrimiento.", en: "If you believe that you or a loved one has not received professional treatment and has suffered damages, we can study your case to find out if you are entitled to claim compensation for your suffering." }
       }
     },
@@ -141,14 +141,14 @@ const texts = {
           { es: "Lesiones en construcción o demolición", en: "Construction or demolition injuries" },
           { es: "Caídas o golpes durante el trabajo", en: "Falls or blows during work" },
           { es: "Uso de maquinaria o herramientas defectuosas", en: "Use of defective machinery or tools" },
-          { es: "Lesiones de espalda, hombro o rodillas", in: "Back, shoulder, or knee injuries" },
+          { es: "Lesiones de espalda, hombro o rodillas", en: "Back, shoulder, or knee injuries" },
           { es: "Accidentes en fábricas o bodegas", en: "Accidents in factories or warehouses" },
           { es: "Falta de equipo o medidas de seguridad", en: "Lack of safety equipment or measures" }
         ],
         benefitsTitle: { es: "Beneficios de una Compensación:", en: "Compensation Benefits:" },
         benefits: [
           { es: "Cubrir tratamientos y rehabilitación", en: "Cover treatments and rehabilitation" },
-          { es: "Recuperar ingresos perdidos", in: "Recover lost wages" },
+          { es: "Recuperar ingresos perdidos", en: "Recover lost wages" },
           { es: "Recibir apoyo si no puedes trabajar", en: "Receive support if you cannot work" },
           { es: "Mantener estabilidad económica para tu familia", en: "Maintain economic stability for your family" }
         ],
@@ -229,15 +229,6 @@ export default function AccidentsPageBilingual() {
 
   const selectedItem = mainCasesData.find(item => item.id === selectedId);
 
-  const responsiveCases = mainCasesData.map((item, index) => {
-    if (index === 0) return { ...item, position: "col-span-3 lg:col-span-2 h-[450px]" }; 
-    if (index === 1) return { ...item, position: "col-span-3 lg:col-span-1 h-[450px]" };
-    if (index === 2) return { ...item, position: "col-span-3 lg:col-span-1 h-[450px]" };
-    if (index === 3) return { ...item, position: "col-span-3 lg:col-span-1 h-[450px]" };
-    if (index === 4) return { ...item, position: "col-span-3 lg:col-span-2 h-[450px]" };
-    return { ...item, position: "col-span-3 lg:col-span-1 h-[450px]" };
-  });
-
   useEffect(() => {
     if (selectedId) document.body.style.overflow = 'hidden';
     else document.body.style.overflow = 'unset';
@@ -245,34 +236,29 @@ export default function AccidentsPageBilingual() {
   }, [selectedId]);
 
 
-  const textRevealVariant: Variants = {
-    hidden: { y: "100%", rotateX: -20, opacity: 0 },
-    visible: (custom: number) => ({
-      y: 0, rotateX: 0, opacity: 1,
-      transition: { duration: 1.2, delay: custom * 0.15, ease: "easeOut" } 
-    })
-  };
-
-
   return (
     <div className="min-h-screen flex flex-col bg-[#001540] text-white relative selection:bg-[#B2904D] selection:text-white font-sans overflow-x-hidden">
       
       <Header />
 
-      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
+      {/* --- FONDO OPTIMIZADO (GPU Friendly) --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full transform-gpu">
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#001f5f]" />
          
-         <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+         <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
 
+         {/* Orbes optimizados: Blur reducido, will-change agregado */}
          <motion.div 
-           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+           animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[120px]" 
+           style={{ willChange: "transform, opacity" }}
+           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[80px]" 
          />
          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[150px]" 
+            style={{ willChange: "transform, opacity" }}
+            className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[90px]" 
          />
          
          <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden">
@@ -293,16 +279,18 @@ export default function AccidentsPageBilingual() {
                 transition={{ duration: 1.5, ease: "easeOut" }}
                 className="lg:col-span-5 relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center"
               >
-                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-3xl rounded-full z-0 opacity-80" />
+                 {/* Blur reducido para mejor rendimiento */}
+                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-2xl rounded-full z-0 opacity-80" />
                  
-                 <div className="relative z-10 w-full h-full flex items-center justify-center">
+                 <div className="relative z-10 w-full h-full flex items-center justify-center transform-gpu">
                     <div className="relative w-full h-full">
                        <Image
                          src="/accident-hero.png"
                          alt="Abogado de Accidentes"
                          fill
-                         className="object-contain object-center drop-shadow-[0_0_30px_rgba(56,189,248,0.6)]"
+                         className="object-contain object-center drop-shadow-[0_0_20px_rgba(56,189,248,0.5)]"
                          priority
+                         sizes="(max-width: 768px) 100vw, 50vw"
                        />
                     </div>
                  </div>
@@ -311,7 +299,8 @@ export default function AccidentsPageBilingual() {
                     initial={{ opacity: 0, x: -20 }} 
                     animate={{ opacity: 1, x: 0 }} 
                     transition={{ delay: 1, duration: 1 }}
-                    className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl backdrop-blur-xl bg-white/5 shadow-2xl"
+                    // Blur reducido
+                    className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl backdrop-blur-md bg-white/10 shadow-2xl"
                  >
                     <div className="flex items-baseline text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-sky-200/50">
                        <span className="text-4xl md:text-5xl font-bold tracking-tighter">10M</span> 
@@ -329,7 +318,7 @@ export default function AccidentsPageBilingual() {
                    className="absolute left-0 top-10 bottom-10 w-[1px] bg-gradient-to-b from-transparent via-[#B2904D]/50 to-transparent origin-top hidden lg:block" 
                  />
 
-                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-md">
+                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-sm">
                     <Star size={14} className="text-[#B2904D] fill-[#B2904D]" />
                     <span className="text-[#B2904D] text-xs font-bold tracking-widest uppercase">{t('badge')}</span>
                  </div>
@@ -338,7 +327,7 @@ export default function AccidentsPageBilingual() {
                     <span className="block text-white/90 font-extralight mb-2">
                       {t('heroTitle1')} 
                     </span>
-                    <span className="block font-medium text-[#B2904D] drop-shadow-2xl">
+                    <span className="block font-medium text-[#B2904D] drop-shadow-xl">
                       {t('heroTitle2')} 
                     </span>
                  </h1>
@@ -358,7 +347,7 @@ export default function AccidentsPageBilingual() {
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
                     className="flex flex-wrap gap-4 pt-4"
                  >
-                    <a href="#contacto" className="px-6 md:px-8 py-3 md:py-4 bg-[#B2904D] hover:bg-white text-[#001540] font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,144,77,0.4)] flex items-center gap-2 group text-sm md:text-base">
+                    <a href="#contacto" className="px-6 md:px-8 py-3 md:py-4 bg-[#B2904D] hover:bg-white text-[#001540] font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(178,144,77,0.3)] flex items-center gap-2 group text-sm md:text-base">
                        <PhoneCall size={18} className="md:w-5 md:h-5" />
                        {t('ctaConsultation')}
                        <ArrowRight size={16} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform"/>
@@ -386,7 +375,7 @@ export default function AccidentsPageBilingual() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8"
             >
               <Scale size={14} className="text-[#B2904D]" />
               <span className="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">{t('specialties')}</span>
@@ -400,7 +389,7 @@ export default function AccidentsPageBilingual() {
               whileInView={{ width: 80 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
+              className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] mx-auto rounded-full shadow-[0_0_10px_#B2904D]"
             />
           </motion.div>
 
@@ -424,20 +413,20 @@ export default function AccidentsPageBilingual() {
                   col-span-3 sm:col-span-2 lg:col-span-1 ${item.position} 
                   group relative rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-8 cursor-pointer 
                   bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 
-                  shadow-[0_10px_30px_rgba(0,0,0,0.3)] 
-                  hover:scale-[1.01] hover:border-[#B2904D]/70 
-                  hover:shadow-[0_0_40px_rgba(178,144,77,0.3)] 
-                  overflow-hidden`}
+                  shadow-[0_5px_15px_rgba(0,0,0,0.2)] 
+                  hover:scale-[1.01] hover:border-[#B2904D]/50 
+                  hover:shadow-[0_0_20px_rgba(178,144,77,0.2)] 
+                  overflow-hidden transform-gpu`}
               >
                 
                 <div 
-                    className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/10 to-transparent 80%`}
+                    className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/5 to-transparent 80%`}
                 />
                 
                 <div 
                     className="absolute inset-0 flex items-center justify-center p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
                 >
-                    <p className="text-center text-4xl font-black text-white/5 leading-snug">
+                    <p className="text-center text-4xl font-black text-white/10 leading-snug">
                         {gT(item.content.intro)}
                     </p>
                 </div>
@@ -448,8 +437,8 @@ export default function AccidentsPageBilingual() {
                   <motion.div 
                     whileHover={{ scale: 1.05 }} 
                     transition={{ duration: 0.4 }}
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg transition-all 
-                                bg-white/10 group-hover:bg-gradient-to-br group-hover:from-[#B2904D] group-hover:to-[#D4AF37]"
+                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-md transition-all 
+                               bg-white/10 group-hover:bg-gradient-to-br group-hover:from-[#B2904D] group-hover:to-[#D4AF37]"
                   >
                     <item.icon size={30} strokeWidth={1.5} />
                   </motion.div>
@@ -473,7 +462,7 @@ export default function AccidentsPageBilingual() {
                         {gT(item.content.description).substring(0, 150)}...
                     </p>
 
-                    <div className="h-px bg-white/20 mb-6 transition-all group-hover:bg-[#B2904D] shadow-[0_0_10px_#B2904D]" />
+                    <div className="h-px bg-white/20 mb-6 transition-all group-hover:bg-[#B2904D] shadow-[0_0_5px_#B2904D]" />
                   </div>
 
                   <motion.div 
@@ -491,7 +480,7 @@ export default function AccidentsPageBilingual() {
                     <motion.div 
                       whileHover={{ scale: 1.1, rotate: 5 }}
                       whileTap={{ scale: 0.9 }}
-                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md bg-white/10 group-hover:bg-[#B2904D] text-[#002342] group-hover:text-white"
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm bg-white/10 group-hover:bg-[#B2904D] text-[#002342] group-hover:text-white"
                     >
                       <ArrowRight size={16} className="text-white/80 group-hover:text-white transition-colors"/>
                     </motion.div>
@@ -510,24 +499,17 @@ export default function AccidentsPageBilingual() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8"
+            // Optimización: Menos blur en el backdrop, más opacidad
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-sm"
             onClick={() => setSelectedId(null)}
           >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedId(null)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-            />
-
             <motion.div
               layoutId={`card-container-${selectedItem.id}`}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-full max-w-7xl h-[90vh] md:h-[80vh] rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 ring-1 ring-black/5"
+              className="w-full max-w-7xl h-[90vh] md:h-[80vh] rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 ring-1 ring-white/10 bg-[#001540]"
               onClick={(e) => e.stopPropagation()} 
             >
               
@@ -543,7 +525,7 @@ export default function AccidentsPageBilingual() {
               <div className="w-full lg:w-2/5 bg-gradient-to-br from-[#002342] via-[#003366] to-[#002342] p-8 md:p-12 flex flex-col justify-center text-white relative overflow-hidden">
                 
                 <motion.div 
-                  className="absolute -right-20 -bottom-20 opacity-5"
+                  className="absolute -right-20 -bottom-20 opacity-5 pointer-events-none"
                 >
                   <selectedItem.icon size={450} strokeWidth={0.5} />
                 </motion.div>
@@ -553,7 +535,7 @@ export default function AccidentsPageBilingual() {
                     initial={{ scale: 0, rotate: -180 }}
                     animate={{ scale: 1, rotate: 0 }}
                     transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                    className="w-16 h-16 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-xl flex items-center justify-center mb-6 shadow-2xl"
+                    className="w-16 h-16 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-xl flex items-center justify-center mb-6 shadow-xl"
                   >
                     <selectedItem.icon size={30} className="text-white" />
                   </motion.div>
@@ -585,7 +567,7 @@ export default function AccidentsPageBilingual() {
                 </div>
               </div>
 
-              <div className="w-full lg:w-3/5 p-8 md:p-12 overflow-y-auto bg-[#001540] text-white">
+              <div className="w-full lg:w-3/5 p-8 md:p-12 overflow-y-auto bg-[#001540] text-white scrollbar-custom">
                 
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -603,7 +585,7 @@ export default function AccidentsPageBilingual() {
                   {selectedItem.id === 'trailer' && selectedItem.content.quotes && (
                     <div className="mt-8 space-y-4">
                         {selectedItem.content.quotes.map((quote, i) => (
-                          <div key={i} className="p-4 bg-white/5 rounded-lg border border-white/10 shadow-lg relative">
+                          <div key={i} className="p-4 bg-white/5 rounded-lg border border-white/10 shadow-md relative">
                             <Quote size={20} className="absolute top-2 right-2 text-white/20"/>
                             <p className="italic text-base text-white mb-1">"{gT(quote.text)}"</p>
                             <p className="text-xs text-white/50">{gT(quote.context)}</p>
@@ -744,7 +726,7 @@ export default function AccidentsPageBilingual() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8"
             >
               <div className="w-2 h-2 bg-[#B2904D] rounded-full animate-pulse"></div>
               <span className="text-xs font-bold tracking-[0.2em] text-white uppercase">{t('videoSectionBadge')}</span>
@@ -776,7 +758,7 @@ export default function AccidentsPageBilingual() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="order-1 lg:order-2 relative group p-6 bg-white/10 backdrop-blur-xl rounded-[2.5rem] shadow-xl border border-white/10"
+            className="order-1 lg:order-2 relative group p-6 bg-white/10 backdrop-blur-md rounded-[2.5rem] shadow-xl border border-white/10"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-xl bg-black aspect-video"> 
               <motion.div 
@@ -789,7 +771,7 @@ export default function AccidentsPageBilingual() {
                 {!isPlaying && (
                   <motion.div 
                     whileHover={{ scale: 1.1 }}
-                    className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/60"
+                    className="w-16 h-16 bg-white/30 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg border border-white/60"
                   >
                     <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-1"></div>
                   </motion.div>
@@ -820,7 +802,7 @@ export default function AccidentsPageBilingual() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 mb-8"
             >
               <FileText size={14} className="text-[#B2904D]" />
               <span className="text-xs font-bold tracking-[0.2em] text-white uppercase">{t('processMethod')}</span>
@@ -832,7 +814,7 @@ export default function AccidentsPageBilingual() {
               whileInView={{ width: 80 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
+              className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_10px_#B2904D]"
             />
           </motion.div>
 
@@ -847,7 +829,7 @@ export default function AccidentsPageBilingual() {
                 whileHover={{ y: -5, scale: 1.01 }}
                 className="group relative"
               >
-                <div className="bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/20 hover:bg-white/20 hover:border-[#B2904D]/50 transition-all duration-300 h-full shadow-lg">
+                <div className="bg-white/10 backdrop-blur-md p-8 rounded-[2rem] border border-white/20 hover:bg-white/20 hover:border-[#B2904D]/50 transition-all duration-300 h-full shadow-lg">
                   
                   <motion.div 
                     initial={{ scale: 0, rotate: -180 }}
@@ -893,7 +875,7 @@ export default function AccidentsPageBilingual() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative z-10 p-8 md:p-12 bg-white/5 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/10" 
+            className="relative z-10 p-8 md:p-12 bg-white/5 backdrop-blur-md rounded-[2rem] shadow-2xl border border-white/10" 
           >
              <div className="text-white"> 
                 <h2 className="text-3xl font-black mb-6">{t('requestEvaluation')}</h2>

@@ -13,10 +13,6 @@ const font = Outfit({
   weight: ['300', '400', '500', '700'] 
 })
 
-// --- COLORES ---
-const PRIMARY_DARK = '#001540';
-const ACCENT_GOLD = '#B2904D';
-
 export default function Footer() {
   const { language } = useLanguage();
   const currentYear = new Date().getFullYear()
@@ -27,6 +23,7 @@ export default function Footer() {
     { name: language === 'es' ? 'ABOGADOS' : 'ATTORNEYS', href: `/${language}/abogados` },
     { name: language === 'es' ? 'OFICINAS' : 'OFFICES', href: `/${language}/oficinas` },
     { name: language === 'es' ? 'INFORMACIÓN' : 'INFORMATION', href: `/${language}/nosotros` },
+    { name: language === 'es' ? 'BLOG' : 'BLOG', href: `/${language}/blog` },
   ]
 
   const socialLinks = [
@@ -44,26 +41,28 @@ export default function Footer() {
   return (
     <footer className={`relative bg-[#001540] text-white overflow-hidden ${font.className}`}>
       
-      {/* 1. DECORACIÓN DE FONDO MEJORADA */}
+      {/* 1. DECORACIÓN DE FONDO OPTIMIZADA */}
       
-      {/* Ruido sutil para textura */}
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)' }}></div>
+      {/* Ruido sutil para textura - Opacidad reducida */}
+      <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)' }}></div>
 
       {/* Borde superior brillante */}
       <div className={`absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-[#B2904D] to-transparent opacity-50`} />
       
-      {/* Glow ambiental superior ANIMADO */}
+      {/* Glow ambiental superior ANIMADO - Optimizado */}
       <motion.div 
         animate={{ 
-          opacity: [0.15, 0.3, 0.15],
-          scale: [1, 1.1, 1]
+          opacity: [0.15, 0.25, 0.15],
+          scale: [1, 1.05, 1]
         }}
         transition={{ 
           duration: 8, 
           repeat: Infinity, 
           ease: "easeInOut" 
         }}
-        className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-[#B2904D]/20 blur-[100px] pointer-events-none rounded-full`} 
+        style={{ willChange: "transform, opacity" }} // Optimización
+        // Blur reducido de 100px a 60px
+        className={`absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-64 bg-[#B2904D]/15 blur-[60px] pointer-events-none rounded-full`} 
       />
       
       <div className="container mx-auto px-4 py-20 relative z-10">
@@ -71,13 +70,14 @@ export default function Footer() {
         {/* LOGO & SOCIALS */}
         <div className="flex flex-col items-center mb-16">
           <Link href={`/${language}`} className="inline-block mb-10 group relative">
-            <div className={`absolute -inset-4 bg-[#B2904D]/20 blur-xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+            {/* Blur reducido */}
+            <div className={`absolute -inset-4 bg-[#B2904D]/10 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
             <Image
               src="/logo-manuel-solis.png"
               alt="Logo Manuel Solis"
               width={300}
               height={90}
-              className="h-24 w-auto relative z-10 drop-shadow-2xl"
+              className="h-24 w-auto relative z-10 drop-shadow-lg"
             />
           </Link>
 
@@ -91,13 +91,13 @@ export default function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={social.name}
-                  whileHover={{ y: -5, scale: 1.1 }}
+                  whileHover={{ y: -3, scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className={`
                     flex items-center justify-center w-12 h-12 rounded-full 
                     bg-white/5 border border-white/10 backdrop-blur-sm
                     text-white transition-all duration-300
-                    hover:bg-[#B2904D] hover:border-[#B2904D] hover:text-[#001540] hover:shadow-[0_0_15px_rgba(178,144,77,0.6)]
+                    hover:bg-[#B2904D] hover:border-[#B2904D] hover:text-[#001540] hover:shadow-[0_0_10px_rgba(178,144,77,0.4)]
                   `}
                 >
                   <IconComponent className="w-5 h-5" />
@@ -164,7 +164,7 @@ export default function Footer() {
         onClick={scrollToTop}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
-        className={`absolute bottom-8 right-8 w-10 h-10 rounded-full bg-[#B2904D]/10 border border-[#B2904D]/30 text-[#B2904D] flex items-center justify-center hover:bg-[#B2904D] hover:text-[#001540] transition-all duration-300 backdrop-blur-md hidden md:flex`}
+        className={`absolute bottom-8 right-8 w-10 h-10 rounded-full bg-[#B2904D]/10 border border-[#B2904D]/30 text-[#B2904D] flex items-center justify-center hover:bg-[#B2904D] hover:text-[#001540] transition-all duration-300 backdrop-blur-sm hidden md:flex`}
       >
         <ArrowUp size={18} />
       </motion.button>

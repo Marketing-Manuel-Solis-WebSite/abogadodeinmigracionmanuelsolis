@@ -11,10 +11,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'manuelsolis.com',
       },
-      // Nuevo dominio de Vercel Blob agregado para corregir el error
+      // ✅ CORRECCIÓN: Este es el dominio nuevo que te dio el error
       {
         protocol: 'https',
-        hostname: '3cbymunqi03dlsyk.public.blob.vercel-storage.com',
+        hostname: 'uenjwzjx3vckezns.public.blob.vercel-storage.com',
         port: '',
         pathname: '/**',
       },

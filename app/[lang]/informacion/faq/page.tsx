@@ -34,7 +34,7 @@ const getText = (obj: any, lang: 'es' | 'en'): string => {
   return obj[lang] || obj.es;
 };
 
-// --- COMPONENTE ACORDEÓN ---
+// --- COMPONENTE ACORDEÓN OPTIMIZADO ---
 function Accordion({ item, lang }: { item: FaqItemBilingual, lang: 'es' | 'en' }) {
   const [isOpen, setIsOpen] = useState(false);
   const title = getText(item.title, lang);
@@ -48,8 +48,8 @@ function Accordion({ item, lang }: { item: FaqItemBilingual, lang: 'es' | 'en' }
         className={`
           w-full px-6 py-5 flex items-center justify-between text-left transition-all duration-300 rounded-xl
           ${isOpen 
-            ? 'bg-white/10 shadow-[0_0_20px_rgba(255,255,255,0.15)] border-white/30' 
-            : 'bg-white/5 hover:bg-white/10 border-white/10 hover:shadow-[0_0_15px_rgba(255,255,255,0.1)]'
+            ? 'bg-white/10 shadow-[0_0_15px_rgba(255,255,255,0.1)] border-white/20' 
+            : 'bg-white/5 hover:bg-white/10 border-white/10 hover:shadow-[0_0_10px_rgba(255,255,255,0.05)]'
           }
           border backdrop-blur-md
         `}
@@ -306,27 +306,29 @@ export default function PreguntasFrecuentesPage() {
       <Header />
 
       {/* =========================================================================
-          FONDO ATMOSFÉRICO (Z-0) - OPTIMIZADO PARA NO BUGUEAR EL SCROLL
+          FONDO ATMOSFÉRICO (Z-0) - OPTIMIZADO
       ========================================================================= */}
-      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
+      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full transform-gpu">
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
          
          {/* Ruido sutil */}
-         <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+         <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
 
-         {/* Animaciones de Luz (Simplificadas para rendimiento) */}
+         {/* Animaciones de Luz Optimizado: Blur reducido y will-change */}
          <motion.div 
-           animate={{ opacity: [0.3, 0.6, 0.3], scale: [1, 1.1, 1] }}
+           animate={{ opacity: [0.2, 0.4, 0.2], scale: [1, 1.1, 1] }}
            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-blue-600/10 rounded-full blur-[120px]" 
+           style={{ willChange: "transform, opacity" }}
+           className="absolute top-0 right-0 w-[50vw] h-[50vw] bg-blue-600/10 rounded-full blur-[80px]" 
          />
          <motion.div 
-            animate={{ opacity: [0.2, 0.5, 0.2], scale: [1, 1.2, 1] }}
+            animate={{ opacity: [0.15, 0.3, 0.15], scale: [1, 1.2, 1] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-0 left-0 w-[60vw] h-[60vw] bg-sky-800/10 rounded-full blur-[150px]" 
+            style={{ willChange: "transform, opacity" }}
+            className="absolute bottom-0 left-0 w-[60vw] h-[60vw] bg-sky-800/10 rounded-full blur-[90px]" 
          />
          
-         {/* N Gigante (Opacidad muy baja para no molestar) */}
+         {/* N Gigante (Opacidad muy baja y estática o will-change si se anima) */}
          <motion.div
             initial={{ x: "60%" }} 
             animate={{ x: "-160%" }} 
@@ -336,6 +338,7 @@ export default function PreguntasFrecuentesPage() {
               ease: "linear",
               repeatType: "loop"
             }}
+            style={{ willChange: "transform" }}
             className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden"
          >
             <span className="text-[120vh] font-black italic text-white tracking-tighter transform -skew-x-12">
@@ -360,13 +363,14 @@ export default function PreguntasFrecuentesPage() {
               transition={{ duration: 1, ease: "easeOut" }}
               className="lg:col-span-5 relative h-[400px] lg:h-[600px] flex items-center justify-center"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-transparent to-transparent blur-3xl rounded-full z-0 opacity-80" />
+              {/* Blur reducido */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-900/40 via-transparent to-transparent blur-2xl rounded-full z-0 opacity-80" />
               
               <motion.div
                 initial={{ scale: 0.8, rotateY: -15 }}
                 animate={{ scale: 1, rotateY: 0 }}
                 transition={{ duration: 1.2, ease: "easeOut" }}
-                className="relative z-10 w-full max-w-md"
+                className="relative z-10 w-full max-w-md transform-gpu"
               >
                 <div className="relative w-full h-full flex items-center justify-center">
                   <Image
@@ -374,18 +378,18 @@ export default function PreguntasFrecuentesPage() {
                     alt="Logo Información"
                     width={500}
                     height={500}
-                    className="object-contain drop-shadow-[0_0_40px_rgba(178,144,77,0.6)] hover:drop-shadow-[0_0_60px_rgba(178,144,77,0.8)] transition-all duration-500"
+                    className="object-contain drop-shadow-[0_0_20px_rgba(178,144,77,0.4)] hover:drop-shadow-[0_0_30px_rgba(178,144,77,0.6)] transition-all duration-500"
                     priority
                   />
                 </div>
               </motion.div>
 
-              {/* Estadística decorativa */}
+              {/* Estadística decorativa - Blur reducido */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }} 
                 animate={{ opacity: 1, y: 0 }} 
                 transition={{ delay: 0.8, duration: 1 }}
-                className="absolute bottom-10 left-0 z-40 p-6 border border-white/10 rounded-xl backdrop-blur-md bg-white/5 shadow-2xl"
+                className="absolute bottom-10 left-0 z-40 p-6 border border-white/10 rounded-xl backdrop-blur-md bg-white/5 shadow-xl"
               >
                 <div className="group">
                   <div className="flex items-baseline text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-sky-200/50">
@@ -429,13 +433,14 @@ export default function PreguntasFrecuentesPage() {
                       transition={{ duration: 1.2, delay: 0.3, ease: [0.25, 1, 0.5, 1] }}
                       className="block font-medium relative w-fit pr-6"
                     >
-                      <span className="text-[#B2904D] drop-shadow-2xl">
+                      <span className="text-[#B2904D] drop-shadow-xl">
                         {lang === 'es' ? 'FRECUENTES' : 'ASKED'}
                       </span>
                       <motion.span 
                         className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent bg-[length:200%_100%] bg-clip-text text-transparent mix-blend-color-dodge pointer-events-none"
                         animate={{ backgroundPosition: ["-150% 0", "150% 0"] }}
                         transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", repeatDelay: 2 }}
+                        style={{ willChange: "background-position" }}
                       >
                         {lang === 'es' ? 'FRECUENTES' : 'ASKED'}
                       </motion.span>
@@ -450,13 +455,14 @@ export default function PreguntasFrecuentesPage() {
                         transition={{ duration: 1.2, delay: 0.45, ease: [0.25, 1, 0.5, 1] }}
                         className="block font-medium relative w-fit pr-6"
                       >
-                        <span className="text-[#B2904D] drop-shadow-2xl">
+                        <span className="text-[#B2904D] drop-shadow-xl">
                           QUESTIONS
                         </span>
                         <motion.span 
                           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent bg-[length:200%_100%] bg-clip-text text-transparent mix-blend-color-dodge pointer-events-none"
                           animate={{ backgroundPosition: ["-150% 0", "150% 0"] }}
                           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", repeatDelay: 2, delay: 0.5 }}
+                          style={{ willChange: "background-position" }}
                         >
                           QUESTIONS
                         </motion.span>
@@ -472,7 +478,7 @@ export default function PreguntasFrecuentesPage() {
                 transition={{ delay: 0.6, duration: 1 }}
                 className="relative"
               >
-                <div className="w-32 h-1 bg-gradient-to-r from-[#B2904D] to-transparent rounded-full shadow-[0_0_20px_#B2904D] mb-6" />
+                <div className="w-32 h-1 bg-gradient-to-r from-[#B2904D] to-transparent rounded-full shadow-[0_0_10px_#B2904D] mb-6" />
                 <p className="text-xl text-white/70 font-extralight max-w-xl leading-relaxed pl-4 border-l border-white/10">
                   {t('hero.subtitle')}
                 </p>
@@ -486,7 +492,7 @@ export default function PreguntasFrecuentesPage() {
               >
                 <div className="group">
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 rounded-full bg-[#B2904D] shadow-[0_0_10px_#B2904D] group-hover:shadow-[0_0_20px_#B2904D] transition-all" />
+                    <div className="w-2 h-2 rounded-full bg-[#B2904D] shadow-[0_0_5px_#B2904D] group-hover:shadow-[0_0_10px_#B2904D] transition-all" />
                     <p className="text-sm text-white/60 uppercase tracking-[0.2em] font-medium group-hover:text-white/90 transition-colors">
                       {lang === 'es' ? 'Respuestas Claras y Profesionales' : 'Clear and Professional Answers'}
                     </p>
@@ -549,8 +555,8 @@ export default function PreguntasFrecuentesPage() {
         <div className="container mx-auto px-4 max-w-4xl text-center">
             
             <div className="mb-12">
-              <h2 className="text-4xl md:text-5xl font-thin text-white mb-4 drop-shadow-[0_0_15px_rgba(255,255,255,0.15)]">
-                  {t('contact.title1')} <span className="font-bold text-[#B2904D] drop-shadow-[0_0_20px_rgba(178,144,77,0.5)]">{t('contact.title2')}</span>
+              <h2 className="text-4xl md:text-5xl font-thin text-white mb-4 drop-shadow-sm">
+                  {t('contact.title1')} <span className="font-bold text-[#B2904D] drop-shadow-[0_0_15px_rgba(178,144,77,0.4)]">{t('contact.title2')}</span>
               </h2>
               <p className="text-blue-100/60 font-light text-lg">
                   {t('contact.subtitle')}

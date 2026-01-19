@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useScroll, useTransform, Variants } from 'framer-motion';
+import { motion, AnimatePresence, Variants } from 'framer-motion';
 import {
   X,
   PhoneCall,
@@ -11,23 +11,23 @@ import {
   HandCoins, 
   MessageSquare, 
   Star,
-  Quote,
-  Gavel, CheckCircle2,
 } from 'lucide-react';
 
 import Image from 'next/image';
 import { Outfit } from 'next/font/google';
+import dynamic from 'next/dynamic';
 
-// --- IMPORTACIONES DE COMPONENTES (RUTAS CORREGIDAS) ---
+// --- IMPORTACIONES DE COMPONENTES ---
 import Header from '../../../components/Header';
 import Footer from '../../../components/Footer';
-import ContactForm from '../../../components/ContactForm';
 import { useLanguage } from '../../../context/LanguageContext';
 
-// --- COLORES ---
-const PRIMARY_DARK = '#001540';
-const ACCENT_GOLD = '#B2904D';
+// --- OPTIMIZACIÓN: LAZY LOAD DEL FORMULARIO ---
+const ContactForm = dynamic(() => import('../../../components/ContactForm'), {
+  loading: () => <div className="h-[500px] w-full bg-white/5 animate-pulse rounded-2xl border border-white/10" />
+});
 
+// --- CONFIGURACIÓN DE FUENTE ---
 const font = Outfit({ 
   subsets: ['latin'], 
   weight: ['100', '200', '300', '400', '500', '700', '900'] 
@@ -163,6 +163,15 @@ export default function FamilyLawPage() {
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
+
+  // --- OPTIMIZACIÓN: DETECCIÓN DE MÓVIL ---
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 1024);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const togglePlayPause = () => {
     if (videoRef.current) {
@@ -182,10 +191,6 @@ export default function FamilyLawPage() {
   const processStepsData = texts.processSteps;
 
   const selectedItem = mainCasesData.find(item => item.id === selectedId);
-
-  const responsiveCases = mainCasesData.map((item, index) => {
-      return { ...item, position: "col-span-3 lg:col-span-1 h-[450px]" }; 
-  });
 
   useEffect(() => {
     if (selectedId) document.body.style.overflow = 'hidden';
@@ -208,24 +213,33 @@ export default function FamilyLawPage() {
       
       <Header />
 
-      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
+      {/* --- FONDO OPTIMIZADO PARA GPU --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full transform-gpu">
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#001f5f]" />
          
-         <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+         <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
 
-         <motion.div 
-           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-           transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[120px]" 
-         />
-         <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[150px]" 
-         />
-         
+         {/* Orbes optimizados: Solo se animan en Desktop */}
+         {!isMobile && (
+           <>
+             <motion.div 
+               animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
+               transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+               style={{ willChange: "transform, opacity" }}
+               className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[100px]" 
+             />
+             <motion.div 
+               animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
+               transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+               style={{ willChange: "transform, opacity" }}
+               className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[120px]" 
+             />
+           </>
+         )}
+
+         {/* Texto Gigante: Estático en móvil para ahorrar recursos */}
          <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden">
-            <span className="text-[120vh] font-black italic text-white tracking-tighter transform -skew-x-12">
+            <span className="text-[50vh] md:text-[120vh] font-black italic text-white tracking-tighter transform -skew-x-12">
                 FAMILIA
             </span>
          </div>
@@ -237,21 +251,23 @@ export default function FamilyLawPage() {
            <div className="grid lg:grid-cols-12 gap-8 md:gap-12 items-center">
              
              <motion.div 
-               initial={{ opacity: 0, scale: 0.9 }}
+               initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
-               transition={{ duration: 1.5, ease: "easeOut" }}
+               transition={{ duration: 1, ease: "easeOut" }}
                className="lg:col-span-5 relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center"
              >
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-3xl rounded-full z-0 opacity-80" />
+                {/* Blur estático y ligero */}
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-2xl rounded-full z-0 opacity-80" />
                 
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
+                <div className="relative z-10 w-full h-full flex items-center justify-center transform-gpu">
                    <div className="relative w-full h-full">
                       <Image
                         src="/family-hero.png"
                         alt="Abogado de Derecho Familiar"
                         fill
-                        className="object-contain object-center drop-shadow-[0_0_30px_rgba(56,189,248,0.6)]"
-                        priority
+                        className="object-contain object-center drop-shadow-[0_0_20px_rgba(56,189,248,0.5)]"
+                        priority // Prioridad alta para LCP
+                        sizes="(max-width: 768px) 100vw, 50vw" // Ayuda al navegador
                       />
                    </div>
                 </div>
@@ -259,8 +275,8 @@ export default function FamilyLawPage() {
                 <motion.div
                    initial={{ opacity: 0, x: -20 }} 
                    animate={{ opacity: 1, x: 0 }} 
-                   transition={{ delay: 1, duration: 1 }}
-                   className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl backdrop-blur-xl bg-white/5 shadow-2xl"
+                   transition={{ delay: 0.5, duration: 0.8 }}
+                   className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl bg-[#001540]/90 shadow-2xl"
                 >
                    <div className="flex items-baseline text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-sky-200/50">
                       <span className="text-4xl md:text-5xl font-bold tracking-tighter">10K</span> 
@@ -274,22 +290,22 @@ export default function FamilyLawPage() {
 
              <div className="lg:col-span-7 space-y-6 md:space-y-8 pl-0 lg:pl-12 relative z-20">
                 <motion.div 
-                   initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 1.5, delay: 0.5 }}
+                   initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 1, delay: 0.2 }}
                    className="absolute left-0 top-10 bottom-10 w-[1px] bg-gradient-to-b from-transparent via-[#B2904D]/50 to-transparent origin-top hidden lg:block" 
                 />
 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-md">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-sm">
                    <Star size={14} className="text-[#B2904D] fill-[#B2904D]" />
                    <span className="text-[#B2904D] text-xs font-bold tracking-widest uppercase">{t('badge')}</span>
                 </div>
 
                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-white tracking-tight leading-[0.9]">
-                   <span className="block overflow-hidden pb-2 perspective-[400px]">
+                   <span className="block overflow-hidden pb-2">
                       <motion.span custom={0} variants={textRevealVariant} initial="hidden" animate="visible" className="block text-white/90">
                           {t('heroTitle1')}
                       </motion.span>
                    </span>
-                   <span className="block overflow-hidden pb-4 perspective-[400px]">
+                   <span className="block overflow-hidden pb-4">
                       <motion.span custom={1} variants={textRevealVariant} initial="hidden" animate="visible" className="block font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#B2904D] via-[#F3E5AB] to-[#B2904D]">
                           {t('heroTitle2')}
                       </motion.span>
@@ -297,14 +313,14 @@ export default function FamilyLawPage() {
                 </h1>
 
                 <motion.p 
-                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
                    className="text-lg md:text-xl text-blue-100/70 font-light max-w-xl leading-relaxed border-l border-white/10 pl-4 md:pl-6"
                 >
                    {t('heroDescription')}
                 </motion.p>
 
                 <motion.div 
-                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}
                    className="flex flex-wrap gap-4 pt-4"
                 >
                    <a href="#contacto" className="px-6 md:px-8 py-3 md:py-4 bg-[#B2904D] hover:bg-white text-[#001540] font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,144,77,0.4)] flex items-center gap-2 group text-sm md:text-base">
@@ -330,27 +346,15 @@ export default function FamilyLawPage() {
             transition={{ duration: 0.8 }}
             className="mb-20 text-center"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
-            >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8">
               <Scale size={14} className="text-[#B2904D]" />
               <span className="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">{t('specialties')}</span>
-            </motion.div>
+            </div>
             
             <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
               {t('casesTitle')}
             </h2>
-            <motion.div 
-              initial={{ width: 0 }}
-              whileInView={{ width: 80 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
-            />
+            <div className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] w-20 mx-auto rounded-full shadow-[0_0_10px_#B2904D]" />
           </motion.div>
 
           <div className="grid grid-cols-3 gap-6">
@@ -358,50 +362,34 @@ export default function FamilyLawPage() {
               <motion.div
                 layoutId={`card-container-${item.id}`}
                 key={item.id}
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
+                viewport={{ once: true, margin: "-20px" }}
                 transition={{ 
                   delay: index * 0.05,
-                  duration: 0.6,
+                  duration: 0.5,
                   ease: "easeOut" 
                 }}
                 onClick={() => setSelectedId(item.id)}
-                onMouseEnter={() => setHoveredCard(item.id)}
-                onMouseLeave={() => setHoveredCard(null)}
+                // --- CORRECCIÓN: Eliminado transform-gpu y ajustado background para legibilidad ---
                 className={`
                   col-span-3 sm:col-span-2 lg:col-span-1 ${item.position} 
                   group relative rounded-[1.5rem] md:rounded-[2.5rem] p-6 md:p-8 cursor-pointer 
-                  bg-white/5 backdrop-blur-md border border-white/10 transition-all duration-300 
-                  shadow-[0_10px_30px_rgba(0,0,0,0.3)] 
+                  border border-white/10 transition-all duration-300 
                   hover:scale-[1.01] hover:border-[#B2904D]/70 
-                  hover:shadow-[0_0_40px_rgba(178,144,77,0.3)] 
-                  overflow-hidden`}
+                  hover:shadow-[0_0_20px_rgba(178,144,77,0.2)] 
+                  overflow-hidden
+                  ${!isMobile ? 'bg-[#001540]/30 backdrop-blur-md' : 'bg-[#001540] border-white/20'} 
+                `}
               >
                 
-                <div 
-                    className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/10 to-transparent 80%`}
-                />
+                <div className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/10 to-transparent 80%`} />
                 
-                <div 
-                    className="absolute inset-0 flex items-center justify-center p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
-                >
-                    <p className="text-center text-4xl font-black text-white/5 leading-snug">
-                        {gT(item.content.intro)}
-                    </p>
-                </div>
-
-
                 <div className="relative z-10 h-full flex flex-col">
                   
-                  <motion.div 
-                    whileHover={{ scale: 1.05 }} 
-                    transition={{ duration: 0.4 }}
-                    className="w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg transition-all 
-                                 bg-white/10 group-hover:bg-gradient-to-br group-hover:from-[#B2904D] group-hover:to-[#D4AF37]"
-                  >
+                  <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-white mb-6 shadow-md transition-all bg-white/10 group-hover:bg-gradient-to-br group-hover:from-[#B2904D] group-hover:to-[#D4AF37]">
                     <item.icon size={30} strokeWidth={1.5} />
-                  </motion.div>
+                  </div>
 
                   <div className="flex-1">
                     <motion.h3 
@@ -422,29 +410,18 @@ export default function FamilyLawPage() {
                         {gT(item.content.description).substring(0, 150)}...
                     </p>
 
-                    <div className="h-px bg-white/20 mb-6 transition-all group-hover:bg-[#B2904D] shadow-[0_0_10px_#B2904D]" />
+                    <div className="h-px bg-white/20 mb-6 transition-all group-hover:bg-[#B2904D] shadow-[0_0_5px_#B2904D]" />
                   </div>
 
-                  <motion.div 
-                    className="flex items-center justify-between mt-auto"
-                    initial={{ x: -10, opacity: 0 }}
-                    whileInView={{ x: 0, opacity: 1 }}
-                    transition={{ delay: index * 0.05 + 0.3 }}
-                  >
-                    <span 
-                        className="font-bold flex items-center gap-2 group-hover:gap-4 transition-all text-white group-hover:text-[#B2904D]"
-                    >
+                  <div className="flex items-center justify-between mt-auto">
+                    <span className="font-bold flex items-center gap-2 group-hover:gap-4 transition-all text-white group-hover:text-[#B2904D]">
                       {t('details')}
                       <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform"/>
                     </span>
-                    <motion.div 
-                      whileHover={{ scale: 1.1, rotate: 5 }}
-                      whileTap={{ scale: 0.9 }}
-                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-md bg-white/10 group-hover:bg-[#B2904D] text-[#002342] group-hover:text-white"
-                    >
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-sm bg-white/10 group-hover:bg-[#B2904D] text-[#002342] group-hover:text-white">
                       <ArrowRight size={16} className="text-white/80 group-hover:text-white transition-colors"/>
-                    </motion.div>
-                  </motion.div>
+                    </div>
+                  </div>
                 </div>
 
               </motion.div>
@@ -459,53 +436,31 @@ export default function FamilyLawPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 md:p-8 bg-black/95 backdrop-blur-sm"
             onClick={() => setSelectedId(null)}
           >
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedId(null)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-xl"
-            />
-
             <motion.div
               layoutId={`card-container-${selectedItem.id}`}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-full max-w-7xl h-[90vh] md:h-[80vh] rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 ring-1 ring-black/5"
+              className="w-full max-w-7xl h-[90vh] md:h-[80vh] rounded-[1.5rem] md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col lg:flex-row z-10 ring-1 ring-white/10 bg-[#001540]"
               onClick={(e) => e.stopPropagation()} 
             >
               
-              <motion.button
+              <button
                 onClick={(e) => { e.stopPropagation(); setSelectedId(null); }}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
                 className="absolute top-6 right-6 z-50 bg-black/40 hover:bg-[#002342] text-white p-3 rounded-full backdrop-blur-md transition-all duration-300 border border-white/20"
               >
                 <X size={24} />
-              </motion.button>
+              </button>
 
               <div className="w-full lg:w-2/5 bg-gradient-to-br from-[#002342] via-[#003366] to-[#002342] p-8 md:p-12 flex flex-col justify-center text-white relative overflow-hidden">
-                
-                <motion.div 
-                  className="absolute -right-20 -bottom-20 opacity-5"
-                >
-                  <selectedItem.icon size={450} strokeWidth={0.5} />
-                </motion.div>
-
                 <div className="relative z-10">
-                  <motion.div 
-                    initial={{ scale: 0, rotate: -180 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                    className="w-16 h-16 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-xl flex items-center justify-center mb-6 shadow-2xl"
-                  >
+                  <div className="w-16 h-16 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-xl flex items-center justify-center mb-6 shadow-xl">
                     <selectedItem.icon size={30} className="text-white" />
-                  </motion.div>
+                  </div>
                   
                   <motion.h3 
                     layoutId={`card-title-${selectedItem.id}`}
@@ -521,12 +476,7 @@ export default function FamilyLawPage() {
                     {gT(selectedItem.subtitle)}
                   </motion.p>
 
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: 60 }}
-                    transition={{ delay: 0.5, duration: 0.6 }}
-                    className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent rounded-full mb-6"
-                  />
+                  <div className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent rounded-full mb-6 w-[60px]" />
 
                   <p className="text-white/70 text-sm leading-relaxed">
                     {t('modalClosing')}
@@ -534,90 +484,58 @@ export default function FamilyLawPage() {
                 </div>
               </div>
 
-              <div className="w-full lg:w-3/5 p-8 md:p-12 overflow-y-auto bg-[#001540] text-white">
+              <div className="w-full lg:w-3/5 p-8 md:p-12 overflow-y-auto bg-[#001540] text-white scrollbar-custom">
                 
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 }}
-                  className="mb-8"
-                >
+                <div className="mb-8">
                   <h4 className="text-2xl md:text-3xl font-black text-white mb-4 leading-snug">
                     {gT(selectedItem.content.intro)}
                   </h4>
                   <p className="text-lg text-blue-100/70 leading-relaxed">
                     {gT(selectedItem.content.description)}
                   </p>
-                </motion.div>
+                </div>
 
                 {selectedItem.content.subPoints && selectedItem.content.subTitle && (
-                    <motion.div 
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.5 }}
-                      className="space-y-6"
-                    >
+                    <div className="space-y-6">
                       <div className="bg-white/5 p-6 md:p-8 rounded-2xl border border-white/10 shadow-sm">
                         <h5 className="font-black text-white mb-5 flex items-center gap-3 text-xl">
-                          <div 
-                            className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md bg-white/10" 
-                          >
+                          <div className="w-10 h-10 rounded-lg flex items-center justify-center shadow-md bg-white/10">
                             <Scale size={20} className="text-white"/> 
                           </div>
                           {gT(selectedItem.content.subTitle)}
                         </h5>
                         <div className="grid md:grid-cols-2 gap-3">
                           {selectedItem.content.subPoints?.map((point: any, i: number) => ( 
-                            <motion.div 
-                              key={i}
-                              initial={{ opacity: 0, x: -20 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.6 + i * 0.05 }}
-                              className="flex items-start gap-3 text-white/70 bg-black/20 p-3 rounded-lg border border-white/10 shadow-xs"
-                            >
+                            <div key={i} className="flex items-start gap-3 text-white/70 bg-black/20 p-3 rounded-lg border border-white/10 shadow-xs">
                               <div className="w-1.5 h-1.5 rounded-full mt-2 shrink-0 bg-[#B2904D]"></div> 
                               <span className="text-sm font-medium">{gT(point)}</span>
-                            </motion.div>
+                            </div>
                           ))}
                         </div>
                       </div>
-                    </motion.div>
+                    </div>
                 )}
 
-
                 {selectedItem.content.solution && (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.7 }}
-                    className="mt-8 bg-white/5 p-6 rounded-2xl border border-white/10 shadow-sm"
-                  >
+                  <div className="mt-8 bg-white/5 p-6 rounded-2xl border border-white/10 shadow-sm">
                     <p className="text-white/80 leading-relaxed font-medium text-base">
                       {gT(selectedItem.content.solution)}
                     </p>
-                  </motion.div>
+                  </div>
                 )}
 
-
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className="mt-10 pt-6 border-t border-white/10"
-                >
-                  <motion.a 
+                <div className="mt-10 pt-6 border-t border-white/10">
+                  <a 
                     href="#contacto" 
                     onClick={() => setSelectedId(null)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
                     className="group w-full py-4 bg-[#B2904D] text-[#002342] rounded-xl font-black flex items-center justify-center gap-3 shadow-lg hover:bg-white transition-all"
                   >
                     <span className="relative flex items-center gap-3 text-lg">
                       <PhoneCall size={20}/>
                       {t('requestEvaluation')}
                     </span>
-                  </motion.a>
-                </motion.div>
+                  </a>
+                </div>
               </div>
 
             </motion.div>
@@ -631,22 +549,16 @@ export default function FamilyLawPage() {
 
         <div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center relative z-10">
           <motion.div 
-            initial={{ opacity: 0, x: -50 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="order-2 lg:order-1"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
-            >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8">
               <div className="w-2 h-2 bg-[#B2904D] rounded-full animate-pulse"></div>
               <span className="text-xs font-bold tracking-[0.2em] text-white uppercase">{t('videoSectionBadge')}</span>
-            </motion.div>
+            </div>
             
             <h2 className="text-4xl font-black text-white mb-6 leading-tight">
               {t('videoSectionTitle')} <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#B2904D] to-[#D4AF37]">Juan Solís</span>
@@ -656,43 +568,37 @@ export default function FamilyLawPage() {
               {t('videoSectionSubtitle')}
             </p>
             
-            <motion.a 
+            <a 
               href="tel:+18664200405"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
               className="group inline-flex items-center gap-4 bg-[#B2904D] text-[#002342] px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:bg-white transition-all"
             >
               <div className="relative w-10 h-10 bg-black/10 rounded-lg flex items-center justify-center">
                 <PhoneCall size={20} />
               </div>
               <span className="relative">{t('callNow')}</span>
-            </motion.a>
+            </a>
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, x: 50 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="order-1 lg:order-2 relative group p-6 bg-white/10 backdrop-blur-xl rounded-[2.5rem] shadow-xl border border-white/10"
           >
             <div className="relative rounded-2xl overflow-hidden shadow-xl bg-black aspect-video"> 
-              <motion.div 
-                initial={{ scale: 1 }}
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
+              <div
                 onClick={togglePlayPause}
                 className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer bg-black/10 hover:bg-black/0 transition-colors"
               >
                 {!isPlaying && (
-                  <motion.div 
-                    whileHover={{ scale: 1.1 }}
-                    className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/60"
-                  >
+                  <div className="w-16 h-16 bg-white/30 backdrop-blur-md rounded-full flex items-center justify-center shadow-lg border border-white/60 hover:scale-110 transition-transform">
                     <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-1"></div>
-                  </motion.div>
+                  </div>
                 )}
-              </motion.div>
+              </div>
+              {/* VIDEO: Añadido loading="lazy" si fuese iframe, o poster si fuese video tag.
+                  Como es un video tag, se deja igual pero el control manual de play ayuda. */}
               <video 
                 ref={videoRef}
                 src="https://vz-9f852395-0ee.b-cdn.net/d7979aa5-40db-49f2-8566-b8a580591661/playlist.m3u8" 
@@ -713,68 +619,41 @@ export default function FamilyLawPage() {
             viewport={{ once: true }}
             className="text-center mb-20"
           >
-            <motion.div
-              initial={{ scale: 0 }}
-              whileInView={{ scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 mb-8"
-            >
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 mb-8">
               <FileText size={14} className="text-[#B2904D]" />
               <span className="text-xs font-bold tracking-[0.2em] text-white uppercase">{t('processMethod')}</span>
-            </motion.div>
+            </div>
             
             <h2 className="text-4xl font-black text-white mb-6">{t('processTitle')}</h2>
-            <motion.div 
-              initial={{ width: 0 }}
-              whileInView={{ width: 80 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
-            />
+            <div className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_10px_#B2904D] w-20" />
           </motion.div>
 
           <div className="grid md:grid-cols-4 gap-8">
             {processStepsData.map((step, index) => (
               <motion.div
                 key={step.id}
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1, duration: 0.6 }}
-                whileHover={{ y: -5, scale: 1.01 }}
                 className="group relative"
               >
                 <div className="bg-white/10 backdrop-blur-xl p-8 rounded-[2rem] border border-white/20 hover:bg-white/20 hover:border-[#B2904D]/50 transition-all duration-300 h-full shadow-lg">
                   
-                  <motion.div 
-                    initial={{ scale: 0, rotate: -180 }}
-                    whileInView={{ scale: 1, rotate: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 + 0.3, type: "spring", stiffness: 200 }}
-                    className="absolute -top-4 -left-4 w-10 h-10 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-lg flex items-center justify-center font-black text-white text-lg shadow-md"
-                  >
+                  <div className="absolute -top-4 -left-4 w-10 h-10 bg-gradient-to-br from-[#B2904D] to-[#D4AF37] rounded-lg flex items-center justify-center font-black text-white text-lg shadow-md">
                     {step.id}
-                  </motion.div>
+                  </div>
 
-                  <motion.div 
-                    className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#B2904D] transition-all"
-                  >
+                  <div className="w-14 h-14 bg-white/20 rounded-lg flex items-center justify-center mb-6 group-hover:bg-[#B2904D] transition-all">
                     <step.icon size={26} className="text-white"/>
-                  </motion.div>
+                  </div>
 
                   <h3 className="font-black text-xl text-white mb-3">{gT(step.title)}</h3>
                   <p className="text-white/70 text-sm leading-relaxed">{gT(step.desc)}</p>
                 </div>
 
                 {index < processStepsData.length - 1 && (
-                  <motion.div 
-                    initial={{ scaleX: 0 }}
-                    whileInView={{ scaleX: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 + 0.6, duration: 0.5 }}
-                    className="hidden md:block absolute top-[25%] -right-4 w-8 h-0.5 bg-gradient-to-r from-[#B2904D] to-transparent origin-left"
-                  />
+                  <div className="hidden md:block absolute top-[25%] -right-4 w-8 h-0.5 bg-gradient-to-r from-[#B2904D] to-transparent origin-left" />
                 )}
               </motion.div>
             ))}
@@ -791,15 +670,14 @@ export default function FamilyLawPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative z-10" 
+            className="relative z-10 p-8 md:p-12 bg-white/5 backdrop-blur-md rounded-[2rem] shadow-2xl border border-white/10" 
           >
-             <div className="text-center mb-12">
-               <h2 className="text-3xl font-black text-white mb-6">{t('requestEvaluation')}</h2>
-               <p className="text-white/70 mb-8">{t('heroDescription')}</p>
-             </div>
-             
-             <ContactForm /> 
-           
+              <div className="text-white"> 
+                <h2 className="text-3xl font-black mb-6">{t('requestEvaluation')}</h2>
+                <p className="text-white/70 mb-8">{t('heroDescription')}</p>
+                <ContactForm /> 
+              </div>
+            
           </motion.div>
         </div>
       </section>

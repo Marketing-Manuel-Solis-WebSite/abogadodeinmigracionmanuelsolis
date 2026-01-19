@@ -1,327 +1,113 @@
-'use client';
+import type { Metadata } from 'next';
+import OfficeClient from './OfficeClient';
+import Script from 'next/script';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Phone, Clock, Star, CheckCircle2, Sparkles, Play } from 'lucide-react';
-import Image from 'next/image';
-import { Outfit } from 'next/font/google';
-import { useParams } from 'next/navigation';
-
-// --- IMPORTACIONES REQUERIDAS ---
-import Header from '../../../components/Header';
-import Footer from '../../../components/Footer';
-import ContactForm from '../../../components/ContactForm';
-
-// --- CONFIGURACIÓN DE FUENTE ---
-const font = Outfit({ 
-  subsets: ['latin'], 
-  weight: ['100', '200', '300', '400', '500', '800', '900'] 
-});
-
-// --- DATOS ESPECÍFICOS: DALLAS ---
-const officeData = {
-  id: 'dallas',
-  city: 'Dallas',
-  state: 'TX',
-  title: { es: 'Dallas, TX Oficina', en: 'Dallas, TX Office' },
-  quote: { es: 'Bendecidos con la fuerza y la gracia de Dios, e inspirados por nuestro deseo de ayudar.', en: 'Blessed with the strength and grace of God, and inspired by our desire to help.' },
-  description: { es: 'Dallas es una de las grandes ciudades de Texas en las que se concentra una buena cantidad de personas que han venido a este país a vivir y contribuir a su sociedad. Por eso, la firma del abogado Manuel Solís quiso abrir una oficina para ponernos al servicio de nuestros clientes. Nuestras oficinas de Dallas están abiertas de lunes a sábado en horario de 9 de la mañana a 9 de la noche, de manera ininterrumpida.', en: 'Dallas is one of the great cities in Texas where a large number of people who have come to this country to live and contribute to its society are concentrated. That is why the Law Firm of Manuel Solís wanted to open an office to serve our clients. Our Dallas offices are open Monday through Saturday from 9 AM to 9 PM, uninterrupted.' },
-  address: '1120 Empire Central Place, Dallas, Texas 75247',
-  phone: '(214) 753-8315',
-  email: 'dallas@manuelsolis.com',
-  hours: { es: 'Lun - Vie 9:00 AM - 6:00 PM | Sáb 8:00 AM - 3:00 PM', en: 'Mon - Fri 9:00 AM - 6:00 PM | Sat 8:00 AM - 3:00 PM' },
-  mapLink: 'https://goo.gl/maps/ze5VqZn4dLzCKKZp6',
-  videoUrl: 'https://manuelsolis.com/wp-content/uploads/2023/12/dallas.mov',
-  services: [
-    { es: 'LEY DE INMIGRACIÓN', en: 'IMMIGRATION LAW' },
-    { es: 'SEGUROS (ASEGURANZA)', en: 'INSURANCE' },
-    { es: 'ACCIDENTES', en: 'ACCIDENTS' }
-  ],
-  managers: [
-    { name: 'Maribel Degollado', role: { es: 'Gerente', en: 'Manager' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-managers-houston-gray-12-233x300.png' }
-  ],
-  attorneys: [
-    { name: 'Manuel Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/37490671-CAC5-4039-8A96-2680CC45304D.png' },
-    { name: 'Manuel E. Solís III', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-10.png' },
-    { name: 'Juan Solís', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-9.png' },
-    { name: 'Mark McBroom', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-12.png' },
-    { name: 'Gregory Finney', role: { es: 'Abogado', en: 'Attorney' }, image: 'https://manuelsolis.com/wp-content/uploads/2024/03/Backgound-lawyers-gray-15-1.png' },
-  ]
+type Props = {
+  params: Promise<{ lang: string }>;
 };
 
-// --- TEXTOS DE INTERFAZ ---
-const uiText = {
-  address: { es: 'Dirección', en: 'Address' },
-  phone: { es: 'Teléfono', en: 'Phone' },
-  hours: { es: 'Horario', en: 'Hours' },
-  viewMap: { es: 'Ver en mapa', en: 'View on map' },
-  services: { es: 'Servicios en esta sede', en: 'Services at this Location' },
-  team: { es: 'Nuestro Equipo Legal', en: 'Our Legal Team' },
-  managers: { es: 'Gerencia', en: 'Management' }
+// --- CONFIGURACIÓN SEO ESPECÍFICA DE LA OFICINA ---
+const OFFICE_INFO = {
+  name: "Manuel Solis Law Firm - Dallas",
+  address: "1120 Empire Central PL",
+  city: "Dallas",
+  state: "TX",
+  zip: "75247",
+  phone: "+1-214-753-8315",
+  // Coordenadas para 1120 Empire Central PL
+  latitude: "32.8122", 
+  longitude: "-96.8728",
+  mapUrl: "https://share.google/sotBoLXMzRVJcTVJ5"
 };
 
-export default function DallasPage() {
-  const params = useParams();
-  const lang = (params?.lang as 'es' | 'en') || 'es';
-  const t = (obj: any) => obj[lang] || obj.es;
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { lang } = await params;
+  const isEs = lang === 'es';
+
+  const title = isEs 
+    ? `Abogados en Dallas, TX (Empire Central) | Manuel Solís`
+    : `Lawyers in Dallas, TX (Empire Central) | Manuel Solis`;
+
+  const description = isEs
+    ? `Oficina de Manuel Solís en Dallas (Empire Central PL). Abogados de inmigración y accidentes listos para defender sus derechos. ¡Consulta Gratis!`
+    : `Manuel Solis Law Office in Dallas (Empire Central PL). Immigration and accident attorneys ready to defend your rights. Free Consultation!`;
+
+  return {
+    title,
+    description,
+    alternates: {
+      canonical: `https://www.manuelsolis.com/${lang}/oficinas/dallas`,
+    },
+    openGraph: {
+      title,
+      description,
+      url: `https://www.manuelsolis.com/${lang}/oficinas/dallas`,
+      images: ['/public/offices/Dallas.png'],
+      type: 'website', 
+    }
+  };
+}
+
+// SCHEMA LOCAL BUSINESS
+const getLocalBusinessSchema = (lang: string) => {
+  return {
+    '@context': 'https://schema.org',
+    '@type': ['LegalService', 'Attorney'],
+    name: 'Manuel Solis Law Firm',
+    description: lang === 'es' 
+      ? 'Oficina legal en Dallas especializada en inmigración y accidentes.' 
+      : 'Law office in Dallas specializing in immigration and accidents.',
+    image: 'https://www.manuelsolis.com/logo-manuel-solis.png',
+    url: `https://www.manuelsolis.com/${lang}/oficinas/dallas`,
+    telephone: OFFICE_INFO.phone,
+    priceRange: '$$',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: OFFICE_INFO.address,
+      addressLocality: OFFICE_INFO.city,
+      addressRegion: OFFICE_INFO.state,
+      postalCode: OFFICE_INFO.zip,
+      addressCountry: 'US'
+    },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: OFFICE_INFO.latitude,
+      longitude: OFFICE_INFO.longitude
+    },
+    openingHoursSpecification: [
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+        opens: '09:00',
+        closes: '18:00'
+      },
+      {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: 'Saturday',
+        opens: '08:00',
+        closes: '15:00'
+      }
+    ],
+    sameAs: [
+      'https://www.facebook.com/AbogadoManuelSolisOficial/',
+      'https://twitter.com/AbogadoMSolis',
+      OFFICE_INFO.mapUrl
+    ]
+  };
+};
+
+export default async function DallasPage({ params }: Props) {
+  const { lang } = await params;
+  const schemaData = getLocalBusinessSchema(lang);
 
   return (
     <>
-      <Header />
-      
-      <main className={`relative w-full min-h-screen bg-[#001540] overflow-hidden ${font.className}`}>
-        
-        {/* --- BACKGROUND FX --- */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
-          
-          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.4, 0.2] }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-blue-600/20 rounded-full blur-[150px]" 
-          />
-          <motion.div 
-            animate={{ scale: [1, 1.3, 1], opacity: [0.15, 0.35, 0.15] }}
-            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 3 }}
-            className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-sky-800/20 rounded-full blur-[180px]" 
-          />
-          
-          <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
-        </div>
-
-        {/* --- CONTENIDO PRINCIPAL --- */}
-        <div className="relative z-10 pt-[160px] pb-20">
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
-
-            {/* --- HERO SECTION --- */}
-            <div className="grid lg:grid-cols-2 gap-12 items-center mb-16 md:mb-24">
-              
-              {/* Texto Hero */}
-              <motion.div 
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8 }}
-              >
-                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#B2904D]/10 border border-[#B2904D]/30 mb-6">
-                  <Sparkles className="text-[#B2904D]" size={14} />
-                  <span className="text-[#B2904D] text-xs font-bold tracking-[0.2em] uppercase">Dallas, Texas</span>
-                </div>
-
-                <h1 className="text-4xl md:text-5xl lg:text-7xl font-thin text-white mb-6 leading-tight">
-                  {t(officeData.title)}
-                </h1>
-
-                <div className="w-24 h-1 bg-gradient-to-r from-[#B2904D] to-transparent mb-8" />
-
-                <p className="text-[#B2904D] font-light italic text-lg md:text-xl border-l-2 border-[#B2904D] pl-6 mb-8">
-                  "{t(officeData.quote)}"
-                </p>
-
-                <p className="text-white/70 text-base md:text-lg leading-relaxed font-light max-w-xl">
-                  {t(officeData.description)}
-                </p>
-              </motion.div>
-
-              {/* Video Hero */}
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="relative aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_60px_rgba(56,189,248,0.15)] group bg-black"
-              >
-                <video 
-                  autoPlay 
-                  muted 
-                  loop 
-                  playsInline 
-                  className="w-full h-full object-cover opacity-80"
-                >
-                  <source src={officeData.videoUrl} type="video/mp4" />
-                  <source src={officeData.videoUrl.replace('.mp4', '.mov')} type="video/quicktime" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001540] via-transparent to-transparent opacity-40" />
-                
-                {/* Indicador visual de video */}
-                <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm p-2 rounded-full border border-white/20">
-                    <Play fill="white" size={16} className="text-white" />
-                </div>
-              </motion.div>
-            </div>
-
-            {/* --- INFO GRID --- */}
-            <div className="grid lg:grid-cols-12 gap-8 lg:gap-16 mb-24">
-              
-              {/* Detalles de Contacto */}
-              <div className="lg:col-span-5 space-y-8">
-                 <motion.div 
-                   initial={{ opacity: 0, y: 20 }}
-                   whileInView={{ opacity: 1, y: 0 }}
-                   viewport={{ once: true }}
-                   className="bg-white/5 backdrop-blur-md rounded-2xl p-6 md:p-8 border border-white/10"
-                 >
-                   <h3 className="text-2xl font-light text-white mb-8 flex items-center gap-3">
-                     <MapPin className="text-[#B2904D]" /> {t(uiText.address)}
-                   </h3>
-                   
-                   <div className="space-y-6">
-                      {/* Dirección */}
-                      <div className="group">
-                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.address)}</p>
-                        <p className="text-white text-lg leading-snug">{officeData.address}</p>
-                        <a href={officeData.mapLink} target="_blank" className="inline-flex items-center gap-2 text-[#B2904D] mt-3 text-sm font-bold hover:text-[#fff] transition-colors">
-                          {t(uiText.viewMap)} →
-                        </a>
-                      </div>
-                      <div className="h-px bg-white/10" />
-
-                      {/* Teléfono */}
-                      <div>
-                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.phone)}</p>
-                        <a href={`tel:${officeData.phone}`} className="text-2xl text-white font-thin hover:text-[#B2904D] transition-colors">
-                          {officeData.phone}
-                        </a>
-                      </div>
-                      <div className="h-px bg-white/10" />
-
-                      {/* Horario */}
-                      <div>
-                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider mb-2">{t(uiText.hours)}</p>
-                        <div className="flex items-start gap-3">
-                          <Clock className="text-[#B2904D] mt-1 shrink-0" size={18} />
-                          <p className="text-white text-base">{t(officeData.hours)}</p>
-                        </div>
-                      </div>
-                   </div>
-                 </motion.div>
-
-                 {/* Lista de Servicios */}
-                 <motion.div 
-                   initial={{ opacity: 0, y: 20 }}
-                   whileInView={{ opacity: 1, y: 0 }}
-                   viewport={{ once: true }}
-                   transition={{ delay: 0.1 }}
-                   className="p-6 md:p-8 rounded-2xl border border-[#B2904D]/30 bg-gradient-to-br from-[#B2904D]/10 to-transparent"
-                 >
-                   <h3 className="text-xl font-light text-white mb-6 flex items-center gap-2">
-                     <Star className="text-[#B2904D]" fill="#B2904D" size={20} /> {t(uiText.services)}
-                   </h3>
-                   <ul className="grid gap-4">
-                     {officeData.services.map((service, idx) => (
-                       <li key={idx} className="flex items-center gap-3">
-                         <CheckCircle2 className="text-[#B2904D] shrink-0" size={18} />
-                         <span className="text-white/90 text-sm md:text-base font-medium tracking-wide">
-                           {t(service)}
-                         </span>
-                       </li>
-                     ))}
-                   </ul>
-                 </motion.div>
-              </div>
-
-              {/* Grid de Equipo (Gerencia + Abogados) */}
-              <div className="lg:col-span-7 space-y-12">
-                
-                {/* Sección Gerencia (Dallas tiene gerente) */}
-                {officeData.managers.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    <div className="flex items-center gap-4 mb-8">
-                      <div className="w-1 h-8 bg-white/50 rounded-full" />
-                      <h3 className="text-2xl font-thin text-white">{t(uiText.managers)}</h3>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                      {officeData.managers.map((person, idx) => (
-                        <div key={idx} className="group text-center bg-white/5 rounded-xl p-4 border border-white/5 hover:border-white/30 transition-all duration-300">
-                          <div className="relative w-20 h-20 mx-auto mb-4">
-                            <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-white transition-all duration-500 shadow-lg">
-                              <Image 
-                                src={person.image} 
-                                alt={person.name} 
-                                width={80} 
-                                height={80} 
-                                className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
-                              />
-                            </div>
-                          </div>
-                          <h5 className="font-bold text-white text-sm leading-tight mb-1">
-                            {person.name}
-                          </h5>
-                          <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
-                            {t(person.role)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Sección Abogados */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.3 }}
-                >
-                  <div className="flex items-center gap-4 mb-10">
-                    <div className="w-1 h-10 bg-[#B2904D] rounded-full" />
-                    <h3 className="text-3xl font-thin text-white">{t(uiText.team)}</h3>
-                  </div>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
-                    {officeData.attorneys.map((person, idx) => (
-                      <div key={idx} className="group text-center bg-white/5 rounded-xl p-4 border border-white/5 hover:border-[#B2904D]/30 transition-all duration-300 hover:bg-white/10">
-                        <div className="relative w-24 h-24 mx-auto mb-4">
-                          <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-[#B2904D] transition-all duration-500 shadow-lg">
-                            <Image 
-                              src={person.image} 
-                              alt={person.name} 
-                              width={96} 
-                              height={96} 
-                              className="w-full h-full object-cover filter grayscale group-hover:grayscale-0 transition-all duration-500" 
-                            />
-                          </div>
-                        </div>
-                        <h5 className="font-bold text-white text-sm md:text-base leading-tight mb-1 group-hover:text-[#B2904D] transition-colors">
-                          {person.name}
-                        </h5>
-                        <span className="text-[10px] font-medium uppercase tracking-wider text-white/40">
-                          {t(person.role)}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* --- FORMULARIO DE CONTACTO --- */}
-            <motion.div 
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="relative max-w-4xl mx-auto"
-            >
-              <div className="bg-[#001540]/80 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-                <div className="h-1.5 w-full bg-gradient-to-r from-[#B2904D] via-[#D4AF37] to-[#B2904D]" />
-                
-                <div className="p-6 md:p-12">
-                   <ContactForm />
-                </div>
-              </div>
-            </motion.div>
-
-          </div>
-        </div>
-      </main>
-
-      <Footer />
+      <Script
+        id="local-schema-dallas"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+      />
+      <OfficeClient />
     </>
   );
 }

@@ -1,5 +1,3 @@
-// app/[lang]/join-in/page.tsx
-
 'use client'
 
 import React, { useState } from 'react';
@@ -9,6 +7,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { motion, AnimatePresence, Variants } from 'framer-motion'; 
 import { User, Phone, Mail, CheckCircle2, ShieldCheck, Zap, XCircle } from 'lucide-react';
 import { Outfit } from 'next/font/google';
+import { track } from '@vercel/analytics/react'; // 1. Importación para Analytics
 
 // --- CONFIGURACIÓN DE FUENTE Y COLORES ---
 const font = Outfit({ subsets: ['latin'], weight: ['100', '300', '400', '500', '700'] });
@@ -26,7 +25,7 @@ const itemVar: Variants = {
   visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
 };
 
-// --- SUBCOMPONENTE: INPUT CON EFECTOS DE FOCO ---
+// --- SUBCOMPONENTE: INPUT CON EFECTOS DE FOCO OPTIMIZADO ---
 const NeonInput = ({ icon: Icon, name, type = "text", placeholder, value, onChange, required = false, autoFocus = false }: any) => {
     const [isFocused, setIsFocused] = useState(false);
 
@@ -48,19 +47,19 @@ const NeonInput = ({ icon: Icon, name, type = "text", placeholder, value, onChan
                 onBlur={() => setIsFocused(false)}
                 required={required}
                 autoFocus={autoFocus}
-                className={`w-full bg-[#000510]/50 border-2 rounded-xl py-4 pl-12 pr-4 text-white font-medium placeholder-slate-500 focus:outline-none transition-all z-10 relative
-                  ${isFocused ? 'border-[#B2904D]/50 bg-[#000510]/80 shadow-[0_0_20px_rgba(178,144,77,0.1)]' : 'border-white/10 hover:border-white/20'}
+                className={`w-full bg-[#000510]/60 border-2 rounded-xl py-4 pl-12 pr-4 text-white font-medium placeholder-slate-500 focus:outline-none transition-colors z-10 relative
+                  ${isFocused ? 'border-[#B2904D]/50 bg-[#000510]/80' : 'border-white/10 hover:border-white/20'}
                 `}
                 placeholder={placeholder}
             />
             
-            {/* Línea inferior animada al hacer foco */}
+            {/* Línea inferior animada al hacer foco - Optimizada */}
             <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-transparent overflow-hidden pointer-events-none">
                <motion.div 
                  initial={{ x: "-100%" }}
                  animate={{ x: isFocused ? "0%" : "-100%" }}
-                 transition={{ duration: 0.4, ease: "circOut" }}
-                 className="w-full h-full bg-[#B2904D] shadow-[0_0_10px_#B2904D]"
+                 transition={{ duration: 0.3, ease: "easeOut" }}
+                 className="w-full h-full bg-[#B2904D] shadow-[0_0_5px_#B2904D]"
                />
             </div>
         </div>
@@ -80,27 +79,28 @@ function FormContent({ formData, isSubmitting, submitStatus, handleSubmit, handl
                 {(submitStatus === 'success' || submitStatus === 'error') && (
                   <motion.div 
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                    className="absolute inset-0 z-50 bg-[#001540]/95 flex flex-col items-center justify-center text-center rounded-[2rem] backdrop-blur-md"
+                    // Optimización: Menos blur y más opacidad
+                    className="absolute inset-0 z-50 bg-[#001540]/98 flex flex-col items-center justify-center text-center rounded-[2rem] backdrop-blur-sm"
                   >
-                     {submitStatus === 'success' ? (
-                       <motion.div
-                          initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                      {submitStatus === 'success' ? (
+                        <motion.div
+                           initial={{ scale: 0 }} animate={{ scale: 1 }}
+                           transition={{ type: "spring", stiffness: 200, damping: 10 }}
                         >
                           <CheckCircle2 size={80} className="text-green-400 mb-6 drop-shadow-[0_0_15px_rgba(74,222,128,0.5)]" />
                           <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">{t('¡Enviado con Éxito!', 'Successfully Sent!')}</h3>
                           <p className="text-blue-200">{t('Nuestro equipo revisará su caso de inmediato.', 'Our team will review your case immediately.')}</p>
                         </motion.div>
-                     ) : (
-                       <motion.div
-                          initial={{ scale: 0 }} animate={{ scale: 1 }}
-                          transition={{ type: "spring", stiffness: 200, damping: 10 }}
+                      ) : (
+                        <motion.div
+                           initial={{ scale: 0 }} animate={{ scale: 1 }}
+                           transition={{ type: "spring", stiffness: 200, damping: 10 }}
                         >
                           <XCircle size={80} className="text-red-400 mb-6 drop-shadow-[0_0_15px_rgba(252,165,165,0.5)]" />
                           <h3 className="text-3xl font-bold text-white mb-2 tracking-tight">{t('Error de Envío', 'Submission Error')}</h3>
                           <p className="text-red-200">{t('Hubo un problema. Intente de nuevo o llame al (713) 701-1731.', 'There was an issue. Please try again or call (713) 701-1731.')}</p>
                         </motion.div>
-                     )}
+                      )}
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -264,6 +264,14 @@ export default function JoinInPage() {
             });
 
             if (response.ok) {
+                
+                // 2. TRACKING DEL EVENTO PERSONALIZADO "Join In Clicks"
+                track('Join In Clicks', {
+                    location: 'join_in_page',
+                    language: lang,
+                    timestamp: new Date().toISOString()
+                });
+
                 setSubmitStatus('success');
                 setFormData({ 
                     firstName: '', 
@@ -295,9 +303,9 @@ export default function JoinInPage() {
         <main className={`relative min-h-screen w-full bg-[#001540] text-white overflow-x-hidden ${font.className}`}>
             <Header />
 
-            <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
+            <div className="fixed inset-0 z-0 pointer-events-none w-full h-full transform-gpu">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
-                <div className="absolute inset-0 opacity-[0.06] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+                <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
             </div>
 
             {/* --- SECCIÓN PRINCIPAL: DOS COLUMNAS --- */}
@@ -340,7 +348,8 @@ export default function JoinInPage() {
                             transition={{ duration: 0.8, delay: 0.2 }}
                             className="lg:col-span-7"
                         >
-                            <div className="p-6 md:p-10 bg-[#001026]/90 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10">
+                            {/* Optimización: Menos blur, más opacidad */}
+                            <div className="p-6 md:p-10 bg-[#001026]/95 backdrop-blur-md rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.8)] border border-white/10">
                                 
                                 <FormContent 
                                     formData={formData} 

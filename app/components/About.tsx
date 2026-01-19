@@ -22,8 +22,8 @@ export default function About() {
     offset: ["start end", "end start"]
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], [0, -100]);
-  const yOrb = useTransform(scrollYProgress, [0, 1], [0, 200]);
+  const yBg = useTransform(scrollYProgress, [0, 1], [0, -80]); // Reducido
+  const yOrb = useTransform(scrollYProgress, [0, 1], [0, 150]); // Reducido
 
   // --- 2. LÓGICA DE MOUSE (PARALLAX INTERACTIVO) ---
   const mouseX = useMotionValue(0);
@@ -35,8 +35,8 @@ export default function About() {
     mouseY.set((clientY - top) / height - 0.5);
   }
 
-  const x = useSpring(useTransform(mouseX, [-0.5, 0.5], [-7, 7]), { stiffness: 50, damping: 20 });
-  const y = useSpring(useTransform(mouseY, [-0.5, 0.5], [-7, 7]), { stiffness: 50, damping: 20 });
+  const x = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), { stiffness: 40, damping: 25 }); // Reducido
+  const y = useSpring(useTransform(mouseY, [-0.5, 0.5], [-5, 5]), { stiffness: 40, damping: 25 });
 
   // --- VARIANTS ---
   const fadeInUp: Variants = {
@@ -62,28 +62,27 @@ export default function About() {
       onMouseMove={handleMouseMove}
       className={`relative py-32 lg:py-44 w-full bg-[#001540] overflow-hidden ${font.className}`}
     >
-      {/* --- FONDO COMPATIBLE (CONTINUIDAD VISUAL) --- */}
-      {/* CORRECCIÓN: El motion.div solo mueve los orbes y el ruido, NO las máscaras de borde */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none">
+      {/* --- FONDO OPTIMIZADO --- */}
+      <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none transform-gpu">
         
         <div className="absolute inset-0 bg-[#001540]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#002868]/30 via-transparent to-[#000a20]/80" />
 
+        {/* Orbes optimizados: Menos blur y sin mix-blend-screen si es posible, o con opacidad reducida */}
         <motion.div 
-            style={{ y: yOrb }}
-            className="absolute top-0 left-0 w-[1000px] h-[1000px] bg-blue-600/10 rounded-full blur-[150px] -translate-x-1/3 -translate-y-1/3 mix-blend-screen" 
+            style={{ y: yOrb, willChange: "transform" }}
+            className="absolute top-0 left-0 w-[800px] h-[800px] bg-blue-600/10 rounded-full blur-[100px] -translate-x-1/3 -translate-y-1/3 mix-blend-screen opacity-60" 
         />
         <motion.div 
-            style={{ y: yOrb }}
-            className="absolute bottom-0 right-0 w-[800px] h-[800px] bg-[#B2904D]/10 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3 mix-blend-screen" 
+            style={{ y: yOrb, willChange: "transform" }}
+            className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-[#B2904D]/10 rounded-full blur-[90px] translate-x-1/3 translate-y-1/3 mix-blend-screen opacity-60" 
         />
         
-        <div className="absolute inset-0 opacity-[0.12] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+        <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
         
       </motion.div>
 
-      {/* --- CORRECCIÓN: MÁSCARAS FUERA DEL PARALLAX (ESTÁTICAS) --- */}
-      {/* Esto asegura que el "escalón negro" desaparezca y la transición sea siempre suave */}
+      {/* --- MÁSCARAS ESTÁTICAS --- */}
       <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-[#000a20] to-transparent z-10 opacity-50 pointer-events-none" />
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#000a20] to-transparent z-10 opacity-50 pointer-events-none" />
 
@@ -91,7 +90,7 @@ export default function About() {
       <div className="container mx-auto px-6 lg:px-12 relative z-10">
         <div className="grid lg:grid-cols-12 gap-12 lg:gap-16 items-center">
           
-          {/* --- COLUMNA IZQUIERDA: TEXTO (Cols 6) --- */}
+          {/* --- COLUMNA IZQUIERDA: TEXTO --- */}
           <motion.div 
             variants={staggerContainer}
             initial="hidden"
@@ -128,9 +127,9 @@ export default function About() {
               </p>
             </motion.div>
 
-            {/* ESTADÍSTICAS */}
+            {/* ESTADÍSTICAS - Optimizado: Menos blur y sombras */}
             <motion.div variants={fadeInUp} className="grid grid-cols-2 gap-6 pl-2 pt-4">
-                <div className="p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors duration-500">
+                <div className="p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/5 transition-colors duration-300">
                     <h3 className="text-4xl font-light text-white flex items-baseline">
                         200 <span className="text-[#B2904D] text-2xl ml-0.5">+</span>
                     </h3>
@@ -138,7 +137,7 @@ export default function About() {
                         {language === 'es' ? 'Profesionales' : 'Professionals'}
                     </p>
                 </div>
-                <div className="p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 transition-colors duration-500">
+                <div className="p-5 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/5 transition-colors duration-300">
                     <h3 className="text-4xl font-light text-white flex items-baseline">
                         35 <span className="text-sky-400 text-2xl ml-0.5">+</span>
                     </h3>
@@ -168,32 +167,31 @@ export default function About() {
             </motion.div>
           </motion.div>
 
-          {/* --- COLUMNA DERECHA: IMAGEN (Cols 6 - MÁS GRANDE) --- */}
+          {/* --- COLUMNA DERECHA: IMAGEN (Cols 6) --- */}
           <motion.div 
-            style={{ x, y }}
+            style={{ x, y, willChange: "transform" }}
             className="lg:col-span-6 relative h-[500px] lg:h-[700px] w-full perspective-[2000px] mt-32 mb-24 lg:mt-0 lg:mb-0"
           >
-             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] bg-blue-600/20 blur-[100px] rounded-full -z-10" />
-             <div className="absolute top-4 -right-4 w-full h-full border border-[#B2904D]/20 rounded-[2rem] z-0 hidden lg:block" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-[85%] bg-blue-600/20 blur-[80px] rounded-full -z-10" />
+              <div className="absolute top-4 -right-4 w-full h-full border border-[#B2904D]/20 rounded-[2rem] z-0 hidden lg:block" />
 
-             <motion.div 
+              <motion.div 
                initial={{ opacity: 0, scale: 0.95, rotateY: 3 }}
                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
                viewport={{ once: true }}
                transition={{ duration: 1.2, ease: "easeOut" }}
-               className="relative z-10 w-full h-full rounded-[2rem] overflow-hidden shadow-2xl shadow-black/40 border border-white/5"
-             >
-                <Image
-                  src="/Familia.png"
-                  alt="Equipo Legal Manuel Solis"
-                  fill
-                  className="object-cover object-[18%_50%] scale-105 hover:scale-110 transition-transform duration-[1.8s]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#001540]/80 via-transparent to-transparent opacity-60" />
-             </motion.div>
-
-             {/* CORRECCIÓN: SE HA ELIMINADO EL CUADRO FLOTANTE "LABEL GRIS" AQUÍ */}
-             
+               className="relative z-10 w-full h-full rounded-[2rem] overflow-hidden shadow-2xl border border-white/5"
+              >
+                 <Image
+                   src="/Familia.png"
+                   alt="Equipo Legal Manuel Solis"
+                   fill
+                   className="object-cover object-[18%_50%] scale-105 hover:scale-110 transition-transform duration-[1.8s]"
+                   sizes="(max-width: 768px) 100vw, 50vw"
+                 />
+                 <div className="absolute inset-0 bg-gradient-to-t from-[#001540]/80 via-transparent to-transparent opacity-60" />
+              </motion.div>
+              
           </motion.div>
 
         </div>

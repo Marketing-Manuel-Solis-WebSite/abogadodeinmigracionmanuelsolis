@@ -19,7 +19,7 @@ interface VideoModalProps {
 
 const FALLBACK_THUMBNAIL = '/testimonials/Residencia_Octavio.png';
 
-// --- COMPONENTE MODAL ---
+// --- COMPONENTE MODAL OPTIMIZADO ---
 function VideoModal({ videoId, onClose }: VideoModalProps) {
   const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1&showinfo=0&controls=1`;
 
@@ -28,7 +28,8 @@ function VideoModal({ videoId, onClose }: VideoModalProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#000a20]/95 backdrop-blur-xl p-4"
+      // OPTIMIZACIÓN: Reducido de backdrop-blur-xl a md y aumentado opacidad de fondo
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-[#000a20]/98 backdrop-blur-md p-4"
       onClick={onClose}
     >
       <motion.div 
@@ -97,11 +98,11 @@ export default function Testimonials() {
     mouseY.set((clientY - top) / height - 0.5);
   }
 
-  const xVideo = useSpring(useTransform(mouseX, [-0.5, 0.5], [-15, 15]), { stiffness: 40, damping: 20 });
-  const yVideo = useSpring(useTransform(mouseY, [-0.5, 0.5], [-15, 15]), { stiffness: 40, damping: 20 });
+  const xVideo = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 30, damping: 25 }); // Reducido rango
+  const yVideo = useSpring(useTransform(mouseY, [-0.5, 0.5], [-10, 10]), { stiffness: 30, damping: 25 });
   
-  const xText = useSpring(useTransform(mouseX, [-0.5, 0.5], [10, -10]), { stiffness: 40, damping: 20 });
-  const yText = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 40, damping: 20 });
+  const xText = useSpring(useTransform(mouseX, [-0.5, 0.5], [8, -8]), { stiffness: 30, damping: 25 });
+  const yText = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), { stiffness: 30, damping: 25 });
 
   // --- 2. LÓGICA DE SCROLL PARALLAX ---
   const { scrollYProgress } = useScroll({
@@ -109,8 +110,8 @@ export default function Testimonials() {
     offset: ["start end", "end start"]
   });
 
-  const yBg = useTransform(scrollYProgress, [0, 1], [0, -100]); // Fondo se mueve lento
-  const yContent = useTransform(scrollYProgress, [0, 1], [50, -50]); // Contenido se mueve contra scroll
+  const yBg = useTransform(scrollYProgress, [0, 1], [0, -80]); // Reducido
+  const yContent = useTransform(scrollYProgress, [0, 1], [40, -40]); // Reducido
 
   return (
     <section 
@@ -119,42 +120,42 @@ export default function Testimonials() {
         onMouseMove={handleMouseMove}
         className={`relative min-h-screen flex flex-col justify-center w-full bg-[#001540] overflow-hidden ${font.className} py-32 lg:py-0`}
     >
-      {/* --- FONDO VIVO CON PROFUNDIDAD (WOW FACTOR) --- */}
-      {/* NOTA: Las máscaras se sacaron de aquí para evitar el efecto de escalón */}
-      <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none">
+      {/* --- FONDO VIVO CON PROFUNDIDAD OPTIMIZADO --- */}
+      <motion.div style={{ y: yBg }} className="absolute inset-0 z-0 pointer-events-none transform-gpu">
         {/* Fondo Base */}
         <div className="absolute inset-0 bg-[#001540]" />
         
-        {/* Orbe 1: Gigante y Respirando (Azul Eléctrico) */}
+        {/* Orbe 1: Optimizado (Blur reducido y will-change) */}
+        <motion.div 
+            animate={{ 
+                scale: [1, 1.1, 1], 
+                opacity: [0.2, 0.3, 0.2],
+                x: [0, 20, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            style={{ willChange: "transform, opacity" }}
+            className="absolute top-[-20%] left-[-10%] w-[80vw] h-[80vw] bg-blue-600/10 rounded-full blur-[90px] translate-z-0" 
+        />
+
+        {/* Orbe 2: Optimizado */}
         <motion.div 
             animate={{ 
                 scale: [1, 1.2, 1], 
-                opacity: [0.2, 0.4, 0.2],
-                x: [0, 30, 0]
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-[-20%] left-[-10%] w-[80vw] h-[80vw] bg-blue-600/10 rounded-full blur-[180px]" 
-        />
-
-        {/* Orbe 2: Dorado sutil moviéndose en contra */}
-        <motion.div 
-            animate={{ 
-                scale: [1, 1.3, 1], 
                 opacity: [0.1, 0.2, 0.1],
-                x: [0, -50, 0],
-                y: [0, 50, 0]
+                x: [0, -30, 0],
+                y: [0, 30, 0]
             }}
             transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-[#B2904D]/10 rounded-full blur-[200px]" 
+            style={{ willChange: "transform, opacity" }}
+            className="absolute bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] bg-[#B2904D]/10 rounded-full blur-[100px] translate-z-0" 
         />
         
-        {/* Partículas flotantes */}
-        <div className="absolute inset-0 opacity-20 bg-[url('/noise.png')] mix-blend-overlay"></div>
+        {/* Partículas flotantes - Opacidad baja para evitar paint thrashing */}
+        <div className="absolute inset-0 opacity-[0.05] bg-[url('/noise.png')] mix-blend-overlay"></div>
 
       </motion.div>
 
-      {/* --- CORRECCIÓN: MÁSCARAS ESTÁTICAS (FUERA DEL PARALLAX) --- */}
-      {/* Esto arregla el "escalón negro" o la etiqueta mal puesta al hacer scroll */}
+      {/* --- MÁSCARAS ESTÁTICAS --- */}
       <div className="absolute top-0 left-0 right-0 h-40 bg-gradient-to-b from-[#000a20] to-transparent z-10 opacity-80 pointer-events-none" />
       <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#000a20] to-transparent z-10 opacity-80 pointer-events-none" />
 
@@ -167,20 +168,20 @@ export default function Testimonials() {
         >
             
             {/* --- COLUMNA VIDEO (IZQUIERDA) --- */}
-            {/* Movimiento magnético + Flotación constante */}
             <motion.div 
-                style={{ x: xVideo, y: yVideo }}
+                style={{ x: xVideo, y: yVideo, willChange: "transform" }}
                 className="lg:col-span-7 relative"
             >
-                {/* Decoración de círculo giratorio detrás */}
+                {/* Decoración de círculo giratorio detrás - Estático o rotación simple */}
                 <motion.div 
                     animate={{ rotate: 360 }}
                     transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+                    style={{ willChange: "transform" }}
                     className="absolute -inset-16 border border-white/5 rounded-full z-0 border-dashed opacity-40 hidden lg:block"
                 />
 
                 <motion.div 
-                    initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
+                    initial={{ opacity: 0, scale: 0.95, rotateY: 5 }}
                     whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 1, ease: "easeOut" }}
@@ -191,7 +192,7 @@ export default function Testimonials() {
                         onClick={() => setIsVideoOpen(true)}
                         className="relative w-full aspect-video rounded-[2rem] overflow-hidden 
                                    border border-white/10 bg-white/5 backdrop-blur-sm shadow-2xl 
-                                   cursor-pointer group-hover:shadow-[#B2904D]/30 group-hover:border-[#B2904D]/50
+                                   cursor-pointer group-hover:shadow-[#B2904D]/20 group-hover:border-[#B2904D]/40
                                    transition-all duration-500 transform-gpu"
                     >
                         {/* Imagen con Zoom suave */}
@@ -199,6 +200,7 @@ export default function Testimonials() {
                             src={current.videoThumbnail}
                             alt={current.name}
                             fill
+                            sizes="(max-width: 768px) 100vw, 60vw"
                             className="object-cover transition-transform duration-[2s] group-hover:scale-105 opacity-90 group-hover:opacity-100"
                         />
                         
@@ -208,26 +210,26 @@ export default function Testimonials() {
                         {/* Botón Play "Wow" */}
                         <div className="absolute inset-0 flex items-center justify-center">
                             <div className="relative flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                                {/* Ondas expansivas */}
+                                {/* Ondas expansivas - Optimizadas */}
                                 <motion.div 
-                                    animate={{ scale: [1, 2], opacity: [0.3, 0] }}
+                                    animate={{ scale: [1, 1.8], opacity: [0.3, 0] }}
                                     transition={{ duration: 2, repeat: Infinity }}
-                                    className="absolute w-24 h-24 bg-[#B2904D]/40 rounded-full"
+                                    className="absolute w-24 h-24 bg-[#B2904D]/30 rounded-full"
                                 />
                                 <motion.div 
-                                    animate={{ scale: [1, 1.5], opacity: [0.4, 0] }}
+                                    animate={{ scale: [1, 1.4], opacity: [0.4, 0] }}
                                     transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
-                                    className="absolute w-24 h-24 bg-[#B2904D]/40 rounded-full"
+                                    className="absolute w-24 h-24 bg-[#B2904D]/30 rounded-full"
                                 />
                                 
                                 {/* El botón real */}
-                                <div className="relative w-24 h-24 bg-[#B2904D] rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(178,144,77,0.5)] z-10 border-2 border-white/20 backdrop-blur-md">
+                                <div className="relative w-24 h-24 bg-[#B2904D] rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(178,144,77,0.4)] z-10 border-2 border-white/20 backdrop-blur-sm">
                                     <Play className="w-10 h-10 text-[#001540] ml-1 fill-[#001540]" />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Texto flotante dentro del video (TRADUCIDO) */}
+                        {/* Texto flotante dentro del video */}
                         <div className="absolute bottom-8 left-8 z-20">
                              <div className="flex items-center gap-2 mb-2">
                                 <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
@@ -244,10 +246,10 @@ export default function Testimonials() {
 
             {/* --- COLUMNA TEXTO (DERECHA) --- */}
             <motion.div 
-                style={{ x: xText, y: yText }}
+                style={{ x: xText, y: yText, willChange: "transform" }}
                 className="lg:col-span-5 relative space-y-10 pl-0 lg:pl-10"
             >
-                 {/* Título de Sección (TRADUCIDO) */}
+                 {/* Título de Sección */}
                  <motion.div 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -282,7 +284,7 @@ export default function Testimonials() {
                     </p>
                  </motion.div>
 
-                 {/* Detalles y Estrellas (TRADUCIDO) */}
+                 {/* Detalles y Estrellas */}
                  <motion.div
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}

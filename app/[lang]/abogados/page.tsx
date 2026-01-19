@@ -15,13 +15,13 @@ import { useLanguage } from '../../context/LanguageContext';
 const PRIMARY_DARK = '#001540';
 const ACCENT_GOLD = '#B2904D';
 
-// Array de abogados optimizado
+// Array de abogados con URLs actualizadas de Vercel Blob
 const attorneys = [
   // --- FUNDADORES Y SOCIOS PRINCIPALES ---
   {
     id: 'manuel-solis',
     name: 'Manuel Solís',
-    image: '/abogados/Manuel Solis.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Manuel%20Solis.png',
     role: {
       es: 'Abogado Principal y Fundador',
       en: 'Principal Attorney and Founder'
@@ -46,7 +46,7 @@ const attorneys = [
   {
     id: 'manuel-solis-iii',
     name: 'Manuel E. Solís III',
-    image: '/abogados/Manuel E Solis III.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Manuel%20E%20Solis%20III.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -68,7 +68,7 @@ const attorneys = [
   {
     id: 'juan-solis',
     name: 'Juan Solís',
-    image: '/abogados/Juan Solis.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Juan%20Solis.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -92,7 +92,7 @@ const attorneys = [
   {
     id: 'andrew-fink',
     name: 'Andrew Fink',
-    image: '/abogados/Andrew Fink.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Andrew%20Fink.png',
     role: { es: 'Socio de Litigio (Chicago)', en: 'Litigation Partner (Chicago)' },
     bio: {
       es: [
@@ -114,7 +114,7 @@ const attorneys = [
   {
     id: 'gregory-finney',
     name: 'Gregory Finney',
-    image: '/abogados/Gregory Finney.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Gregory%20Finney.png',
     role: { es: 'Director de Litigio Civil', en: 'Civil Litigation Director' },
     bio: {
       es: [
@@ -139,7 +139,7 @@ const attorneys = [
   {
     id: 'ni-yan',
     name: 'Ni Yan',
-    image: '/abogados/Ni Yan.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Ni%20Yan.png',
     role: { es: 'Abogada', en: 'Attorney' },
     bio: {
       es: [
@@ -161,7 +161,7 @@ const attorneys = [
   {
     id: 'mark-mcbroom',
     name: 'Mark McBroom',
-    image: '/abogados/Mark McBroom.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Mark%20McBroom.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -183,7 +183,7 @@ const attorneys = [
   {
     id: 'ana-patricia-rueda',
     name: 'Ana Patricia Rueda',
-    image: '/abogados/Ana Patricia Rueda.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Ana%20Patricia%20Rueda.png',
     role: { es: 'Abogada', en: 'Attorney' },
     bio: {
       es: [
@@ -205,7 +205,7 @@ const attorneys = [
   {
     id: 'edwin-zavala',
     name: 'Edwin Zavala',
-    image: '/abogados/Edwin Zavala.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Edwin%20Zavala.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -227,7 +227,7 @@ const attorneys = [
   {
     id: 'alejandro-manzano',
     name: 'Alejandro Manzano',
-    image: '/abogados/placeholder.png', // No hay imagen específica en tu lista
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Alejandro.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -257,7 +257,7 @@ const attorneys = [
   {
     id: 'victor-rojas',
     name: 'Victor Rojas',
-    image: '/abogados/Victor Rojas.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Victor%20Rojas.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -282,7 +282,7 @@ const attorneys = [
   {
     id: 'austen-gunnels',
     name: 'Austen Gunnels',
-    image: '/abogados/Austen Gunnels.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Austen%20Gunnels.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -311,7 +311,7 @@ const attorneys = [
   {
     id: 'gabriel-perez',
     name: 'Gabriel Perez',
-    image: '/abogados/Gabriel Perez.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Gabriel%20Perez.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -336,7 +336,7 @@ const attorneys = [
   {
     id: 'sara-james',
     name: 'Sara James',
-    image: '/abogados/Sara James.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Sara%20James.png',
     role: { es: 'Abogada (Memphis)', en: 'Attorney (Memphis)' },
     bio: {
       es: [
@@ -361,7 +361,7 @@ const attorneys = [
   {
     id: 'eduardo-garcia',
     name: 'Eduardo García',
-    image: '/abogados/Eduardo.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Eduardo.png',
     role: { es: 'Abogado', en: 'Attorney' },
     bio: {
       es: [
@@ -386,7 +386,7 @@ const attorneys = [
   {
     id: 'alexis-alvarez',
     name: 'Alexis Alvarez',
-    image: '/abogados/Alexis-Alvarez.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Alexis-Alvarez.png',
     role: { es: 'Abogada', en: 'Attorney' },
     bio: {
       es: [
@@ -411,7 +411,7 @@ const attorneys = [
   {
     id: 'edward-s-reisman',
     name: 'Edward S. Reisman',
-    image: '/abogados/Edward-Steven-Reisman.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Edward-Steven-Reisman.png',
     role: { es: 'Abogado (Los Ángeles)', en: 'Attorney (Los Angeles)' },
     bio: {
       es: [
@@ -436,7 +436,7 @@ const attorneys = [
   {
     id: 'stephanie-l-garcia-vidal',
     name: 'Stephanie L. García Vidal',
-    image: '/abogados/Stephanie.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Stephanie.png',
     role: { es: 'Abogada (Dallas)', en: 'Attorney (Dallas)' },
     bio: {
       es: [
@@ -470,7 +470,7 @@ const attorneys = [
   {
     id: 'lupita-valenzuela-martinez',
     name: 'Lupita Valenzuela Martinez',
-    image: '/abogados/Lupita.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Lupita.png',
     role: { es: 'Abogada (Memphis)', en: 'Attorney (Memphis)' },
     bio: {
       es: [
@@ -505,7 +505,7 @@ const attorneys = [
   {
     id: 'himani-augustina-vithanage',
     name: 'Himani Augustina Vithanage',
-    image: '/abogados/Himani Augustina Vithanage.png',
+    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Himani%20Augustina%20Vithanage.png',
     role: { es: 'Abogada', en: 'Attorney' },
     bio: {
       es: [
@@ -572,11 +572,11 @@ export default function AttorneysPage() {
 
       {/* FONDO ATMOSFÉRICO OPTIMIZADO */}
       <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
-         
-         {/* Texto Gigante Animado - Optimizado con will-change */}
-         <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
-           <motion.div
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#000a20]" />
+          
+          {/* Texto Gigante Animado - Optimizado con will-change */}
+          <div className="absolute inset-0 flex items-center justify-center overflow-hidden">
+            <motion.div
               initial={{ x: "100%" }} 
               animate={{ x: "-100%" }} 
               transition={{ 
@@ -592,23 +592,23 @@ export default function AttorneysPage() {
                 N/\И/\N/\N/
               </span>
             </motion.div>
-         </div>
+          </div>
 
-         {/* Orbes de luz optimizados */}
-         <motion.div 
-           animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
-           transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-blue-500/30 rounded-full blur-[150px]"
-           style={{ willChange: 'transform, opacity' }}
-         />
-         <motion.div 
+          {/* Orbes de luz optimizados */}
+          <motion.div 
+            animate={{ scale: [1, 1.1, 1], opacity: [0.4, 0.6, 0.4] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[-20%] right-[-10%] w-[70vw] h-[70vw] bg-blue-500/30 rounded-full blur-[150px]"
+            style={{ willChange: 'transform, opacity' }}
+          />
+          <motion.div 
             animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
             transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
             className="absolute bottom-[-20%] left-[-10%] w-[60vw] h-[60vw] bg-sky-600/30 rounded-full blur-[180px]"
             style={{ willChange: 'transform, opacity' }}
-         />
-         
-         <div className="absolute inset-0 bg-blue-950/20 mix-blend-multiply"></div>
+          />
+          
+          <div className="absolute inset-0 bg-blue-950/20 mix-blend-multiply"></div>
       </div>
       
       {/* HERO SECTION */}

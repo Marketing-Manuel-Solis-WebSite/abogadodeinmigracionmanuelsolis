@@ -238,108 +238,119 @@ export default function InsuranceClaimsPage() {
       
       <Header />
 
-      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full">
+      {/* --- FONDO OPTIMIZADO --- */}
+      <div className="fixed inset-0 z-0 pointer-events-none w-full h-full transform-gpu">
          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#002868] via-[#001540] to-[#001f5f]" />
-         <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+         <div className="absolute inset-0 opacity-[0.05] mix-blend-overlay" style={{ backgroundImage: 'url(/noise.png)', backgroundRepeat: 'repeat' }}></div>
+         
+         {/* Orbes optimizados: Blur reducido, will-change y opacity controlada */}
          <motion.div 
-           animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+           animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] }}
            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[120px]" 
+           style={{ willChange: "transform, opacity" }}
+           className="absolute top-[-10%] right-[-5%] w-[60vw] h-[60vw] bg-blue-600/10 rounded-full blur-[80px]" 
          />
          <motion.div 
-            animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.5, 0.2] }}
+            animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.3, 0.15] }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-            className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[150px]" 
+            style={{ willChange: "transform, opacity" }}
+            className="absolute bottom-[-10%] left-[-5%] w-[70vw] h-[70vw] bg-sky-800/10 rounded-full blur-[90px]" 
          />
+         
          <div className="absolute inset-0 flex items-center justify-center opacity-[0.02] pointer-events-none select-none overflow-hidden">
-            <span className="text-[120vh] font-black italic text-white tracking-tighter transform -skew-x-12">N/\</span>
+            <span className="text-[120vh] font-black italic text-white tracking-tighter transform -skew-x-12">
+               SEGUROS
+            </span>
          </div>
       </div>
 
       <section className="relative pt-32 md:pt-40 pb-16 md:pb-24 px-4 z-10 min-h-[85vh] md:min-h-[90vh] flex flex-col justify-center">
         <div className="container mx-auto max-w-7xl">
            <div className="grid lg:grid-cols-12 gap-8 md:gap-12 items-center">
-             
-             <motion.div 
-               initial={{ opacity: 0, scale: 0.9 }}
-               animate={{ opacity: 1, scale: 1 }}
-               transition={{ duration: 1.5, ease: "easeOut" }}
-               className="lg:col-span-5 relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center"
-             >
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-3xl rounded-full z-0 opacity-80" />
-                <div className="relative z-10 w-full h-full flex items-center justify-center">
-                   <div className="relative w-full h-full">
-                      <Image
-                        src="/insurance-hero.png"
-                        alt="Abogado de Reclamaciones de Seguros"
-                        fill
-                        className="object-contain object-center drop-shadow-[0_0_30px_rgba(56,189,248,0.6)]"
-                        priority
-                      />
-                   </div>
-                </div>
+              
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.5, ease: "easeOut" }}
+                className="lg:col-span-5 relative h-[400px] sm:h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center"
+              >
+                 {/* Blur reducido */}
+                 <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 via-transparent to-transparent blur-2xl rounded-full z-0 opacity-80" />
+                 <div className="relative z-10 w-full h-full flex items-center justify-center transform-gpu">
+                    <div className="relative w-full h-full">
+                       <Image
+                         src="/insurance-hero.png"
+                         alt="Abogado de Reclamaciones de Seguros"
+                         fill
+                         className="object-contain object-center drop-shadow-[0_0_20px_rgba(56,189,248,0.5)]"
+                         priority
+                         sizes="(max-width: 768px) 100vw, 50vw"
+                       />
+                    </div>
+                 </div>
 
-                <motion.div
-                   initial={{ opacity: 0, x: -20 }} 
-                   animate={{ opacity: 1, x: 0 }} 
-                   transition={{ delay: 1, duration: 1 }}
-                   className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl backdrop-blur-xl bg-white/5 shadow-2xl"
-                >
-                   <div className="flex items-baseline text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-sky-200/50">
-                      <span className="text-4xl md:text-5xl font-bold tracking-tighter">8K</span> 
-                      <span className="text-3xl md:text-4xl font-thin text-[#B2904D] ml-1">+</span>
-                   </div>
-                   <p className="text-xs text-white/60 uppercase tracking-[0.2em] mt-2 font-medium">
-                      {t('stats')}
-                   </p>
-                </motion.div>
-             </motion.div>
+                 <motion.div
+                    initial={{ opacity: 0, x: -20 }} 
+                    animate={{ opacity: 1, x: 0 }} 
+                    transition={{ delay: 1, duration: 1 }}
+                    // Blur reducido y optimizado
+                    className="absolute bottom-4 md:bottom-10 left-0 md:left-[-20px] z-20 p-4 md:p-6 border border-white/10 rounded-2xl backdrop-blur-md bg-white/10 shadow-2xl"
+                 >
+                    <div className="flex items-baseline text-transparent bg-clip-text bg-gradient-to-b from-white via-white to-sky-200/50">
+                       <span className="text-4xl md:text-5xl font-bold tracking-tighter">8K</span> 
+                       <span className="text-3xl md:text-4xl font-thin text-[#B2904D] ml-1">+</span>
+                    </div>
+                    <p className="text-xs text-white/60 uppercase tracking-[0.2em] mt-2 font-medium">
+                       {t('stats')}
+                    </p>
+                 </motion.div>
+              </motion.div>
 
-             <div className="lg:col-span-7 space-y-6 md:space-y-8 pl-0 lg:pl-12 relative z-20">
-                <motion.div 
+              <div className="lg:col-span-7 space-y-6 md:space-y-8 pl-0 lg:pl-12 relative z-20">
+                 <motion.div 
                    initial={{ scaleY: 0 }} animate={{ scaleY: 1 }} transition={{ duration: 1.5, delay: 0.5 }}
                    className="absolute left-0 top-10 bottom-10 w-[1px] bg-gradient-to-b from-transparent via-[#B2904D]/50 to-transparent origin-top hidden lg:block" 
-                />
+                 />
 
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-md">
-                   <Zap size={14} className="text-[#B2904D] fill-[#B2904D]" />
-                   <span className="text-[#B2904D] text-xs font-bold tracking-widest uppercase">{t('badge')}</span>
-                </div>
+                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#B2904D]/30 bg-[#B2904D]/10 backdrop-blur-sm">
+                    <Zap size={14} className="text-[#B2904D] fill-[#B2904D]" />
+                    <span className="text-[#B2904D] text-xs font-bold tracking-widest uppercase">{t('badge')}</span>
+                 </div>
 
-                <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-thin text-white tracking-tight leading-[1.4]">
-                   <span className="block overflow-visible pb-1 md:pb-2 perspective-[400px]">
-                      <motion.span custom={0} variants={textRevealVariant} initial="hidden" animate="visible" className="block text-white/90 whitespace-normal">
+                 <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-7xl font-thin text-white tracking-tight leading-[1.4]">
+                    <span className="block overflow-visible pb-1 md:pb-2 perspective-[400px]">
+                       <motion.span custom={0} variants={textRevealVariant} initial="hidden" animate="visible" className="block text-white/90 whitespace-normal">
                           {t('heroTitle1')}
-                      </motion.span>
-                   </span>
-                   <span className="block overflow-visible pb-2 md:pb-4 perspective-[400px]">
-                      <motion.span custom={1} variants={textRevealVariant} initial="hidden" animate="visible" className="block font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#B2904D] via-[#F3E5AB] to-[#B2904D] whitespace-normal">
+                       </motion.span>
+                    </span>
+                    <span className="block overflow-visible pb-2 md:pb-4 perspective-[400px]">
+                       <motion.span custom={1} variants={textRevealVariant} initial="hidden" animate="visible" className="block font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#B2904D] via-[#F3E5AB] to-[#B2904D] whitespace-normal">
                           {t('heroTitle2')}
-                      </motion.span>
-                   </span>
-                </h1>
+                       </motion.span>
+                    </span>
+                 </h1>
 
-                <motion.p 
-                   initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-                   className="text-lg md:text-xl text-blue-100/70 font-light max-w-xl leading-relaxed border-l border-white/10 pl-4 md:pl-6"
-                >
-                   {t('heroDescription')}
-                </motion.p>
+                 <motion.p 
+                    initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
+                    className="text-lg md:text-xl text-blue-100/70 font-light max-w-xl leading-relaxed border-l border-white/10 pl-4 md:pl-6"
+                 >
+                    {t('heroDescription')}
+                 </motion.p>
 
-                <motion.div 
-                   initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
-                   className="flex flex-wrap gap-4 pt-4"
-                >
-                   <a href="#contacto" className="px-6 md:px-8 py-3 md:py-4 bg-[#B2904D] hover:bg-white text-[#001540] font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,144,77,0.4)] flex items-center gap-2 group text-sm md:text-base">
-                      <PhoneCall size={18} className="md:w-5 md:h-5" />
-                      {t('ctaConsultation')}
-                      <ArrowRight size={16} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform"/>
-                   </a>
-                   <a href="#casos" className="px-6 md:px-8 py-3 md:py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all border border-white/10 flex items-center gap-2 group text-sm md:text-base">
-                      {t('ctaCases')}
-                   </a>
-                </motion.div>
-             </div>
+                 <motion.div 
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}
+                    className="flex flex-wrap gap-4 pt-4"
+                 >
+                    <a href="#contacto" className="px-6 md:px-8 py-3 md:py-4 bg-[#B2904D] hover:bg-white text-[#001540] font-bold rounded-xl transition-all shadow-[0_0_20px_rgba(178,144,77,0.4)] flex items-center gap-2 group text-sm md:text-base">
+                       <PhoneCall size={18} className="md:w-5 md:h-5" />
+                       {t('ctaConsultation')}
+                       <ArrowRight size={16} className="md:w-[18px] md:h-[18px] group-hover:translate-x-1 transition-transform"/>
+                    </a>
+                    <a href="#casos" className="px-6 md:px-8 py-3 md:py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-xl transition-all border border-white/10 flex items-center gap-2 group text-sm md:text-base">
+                       {t('ctaCases')}
+                    </a>
+                 </motion.div>
+              </div>
 
            </div>
         </div>
@@ -359,7 +370,7 @@ export default function InsuranceClaimsPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8"
             >
               <Scale size={14} className="text-[#B2904D]" />
               <span className="text-xs font-bold tracking-[0.2em] text-white/80 uppercase">{t('specialties')}</span>
@@ -373,7 +384,7 @@ export default function InsuranceClaimsPage() {
               whileInView={{ width: 80 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
+              className="h-1 bg-gradient-to-r from-[#B2904D] to-[#D4AF37] mx-auto rounded-full shadow-[0_0_10px_#B2904D]"
             />
           </motion.div>
 
@@ -400,17 +411,17 @@ export default function InsuranceClaimsPage() {
                   shadow-[0_10px_30px_rgba(0,0,0,0.3)] 
                   hover:scale-[1.01] hover:border-[#B2904D]/70 
                   hover:shadow-[0_0_40px_rgba(178,144,77,0.3)] 
-                  overflow-hidden`}
+                  overflow-hidden transform-gpu`}
               >
                 
                 <div 
-                    className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-10 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/10 to-transparent 80%`}
+                    className={`absolute inset-0 rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#B2904D]/10 to-transparent 80%`}
                 />
                 
                 <div 
                     className="absolute inset-0 flex items-center justify-center p-8 opacity-0 group-hover:opacity-10 transition-opacity duration-500"
                 >
-                    <p className="text-center text-4xl font-black text-white/5 leading-snug">
+                    <p className="text-center text-4xl font-black text-white/10 leading-snug">
                         {gT(item.content.intro)}
                     </p>
                 </div>
@@ -490,7 +501,7 @@ export default function InsuranceClaimsPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedId(null)}
-              className="absolute inset-0 bg-black/90 backdrop-blur-xl"
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
             />
 
             <motion.div
@@ -663,7 +674,7 @@ export default function InsuranceClaimsPage() {
               whileInView={{ scale: 1 }}
               viewport={{ once: true }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-xl shadow-sm mb-8"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 backdrop-blur-md shadow-sm mb-8"
             >
               <div className="w-2 h-2 bg-[#B2904D] rounded-full animate-pulse"></div>
               <span className="text-xs font-bold tracking-[0.2em] text-white uppercase">{t('videoSectionBadge')}</span>
@@ -751,7 +762,7 @@ export default function InsuranceClaimsPage() {
               whileInView={{ width: 80 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
-              className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_15px_#B2904D]"
+              className="h-1 bg-gradient-to-r from-[#B2904D] to-transparent mx-auto rounded-full shadow-[0_0_10px_#B2904D]"
             />
           </motion.div>
 
@@ -812,7 +823,7 @@ export default function InsuranceClaimsPage() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="relative z-10 p-8 md:p-12 bg-white/5 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white/10" 
+            className="relative z-10 p-8 md:p-12 bg-white/5 backdrop-blur-md rounded-[2rem] shadow-2xl border border-white/10" 
           >
              <div className="text-white"> 
                 <h2 className="text-3xl font-black mb-6">{t('requestEvaluation')}</h2>

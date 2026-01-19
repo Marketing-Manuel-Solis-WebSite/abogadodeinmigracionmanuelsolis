@@ -113,18 +113,16 @@ export default function AIChatButton() {
         style={{
           background: 'radial-gradient(circle at 35% 35%, #F9E79F 0%, #D4AF37 40%, #997B2F 100%)',
           boxShadow: `
-            0 15px 35px -5px rgba(0, 0, 0, 0.4), 
-            inset 0 4px 6px rgba(255, 255, 255, 0.7), 
-            inset 0 -4px 6px rgba(0, 0, 0, 0.3)
-          `,
+            0 10px 25px -5px rgba(0, 0, 0, 0.4), 
+            inset 0 2px 4px rgba(255, 255, 255, 0.5)
+          `, // Sombra simplificada
           border: '1px solid rgba(255, 255, 255, 0.3)'
         }}
         whileHover={{ 
-          scale: 1.1, 
+          scale: 1.05, // Escala reducida
           boxShadow: `
-            0 20px 40px -5px rgba(0, 0, 0, 0.5), 
-            inset 0 4px 6px rgba(255, 255, 255, 0.8), 
-            inset 0 -4px 6px rgba(0, 0, 0, 0.3)
+            0 15px 30px -5px rgba(0, 0, 0, 0.5), 
+            inset 0 4px 6px rgba(255, 255, 255, 0.6)
           ` 
         }}
         whileTap={{ scale: 0.95 }}
@@ -138,7 +136,6 @@ export default function AIChatButton() {
               exit={{ scale: 0, rotate: 90, opacity: 0 }}
               transition={{ duration: 0.2 }}
             >
-              {/* Texto AI en lugar de icono */}
               <span className="font-serif font-black text-2xl text-[#002342] tracking-tighter drop-shadow-sm">
                 AI
               </span>
@@ -161,19 +158,23 @@ export default function AIChatButton() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95, filter: 'blur(10px)' }}
-            animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-            exit={{ opacity: 0, y: 20, scale: 0.95, filter: 'blur(10px)' }}
+            initial={{ opacity: 0, y: 20, scale: 0.95 }} // Eliminado filter: blur en animación inicial
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             className="fixed bottom-28 right-6 z-50 w-[90vw] md:w-[400px] h-[600px] max-h-[75vh] flex flex-col overflow-hidden rounded-[30px] border border-white/10 shadow-2xl"
             style={{
-              background: 'rgba(5, 15, 30, 0.85)', 
-              backdropFilter: 'blur(25px) saturate(180%)', 
-              boxShadow: '0 40px 80px -12px rgba(0, 0, 0, 0.6)'
+              // OPTIMIZACIÓN CRÍTICA:
+              // 1. Aumentamos opacidad del fondo (0.92)
+              // 2. Reducimos el blur (12px en lugar de 25px)
+              // Esto reduce drásticamente el costo de renderizado
+              background: 'rgba(5, 15, 30, 0.92)', 
+              backdropFilter: 'blur(12px)', 
+              boxShadow: '0 20px 40px -10px rgba(0, 0, 0, 0.5)'
             }}
           >
             
-            {/* Header: Minimalista (Sin iconos, solo texto) */}
+            {/* Header */}
             <div className="relative px-8 py-6 border-b border-white/5 bg-gradient-to-r from-white/5 to-transparent">
               <div>
                 <h3 className="text-white font-serif font-bold text-xl tracking-wide text-shadow-sm mb-1">
@@ -190,15 +191,15 @@ export default function AIChatButton() {
               {messages.map((msg, idx) => (
                 <motion.div
                   key={idx}
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  initial={{ opacity: 0, y: 10 }} // Animación simplificada (sin scale)
+                  animate={{ opacity: 1, y: 0 }}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
                   <div className={`
-                    max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-md relative
+                    max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm relative
                     ${msg.role === 'user' 
                       ? 'bg-gradient-to-br from-[#F9E79F] to-[#D4AF37] text-[#002342] font-semibold rounded-br-sm' 
-                      : 'bg-white/10 text-gray-100 border border-white/5 rounded-bl-sm backdrop-blur-md'
+                      : 'bg-white/10 text-gray-100 border border-white/5 rounded-bl-sm' // Eliminado backdrop-blur en mensajes individuales
                     }
                   `}>
                     {msg.content}
@@ -216,7 +217,7 @@ export default function AIChatButton() {
                     <button
                       key={idx}
                       onClick={() => setInput(example)}
-                      className="w-full text-left p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#D4AF37]/40 text-gray-300 text-xs transition-all duration-300 flex items-center gap-3 group backdrop-blur-sm"
+                      className="w-full text-left p-3.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 hover:border-[#D4AF37]/40 text-gray-300 text-xs transition-all duration-200 flex items-center gap-3 group"
                     >
                       <div className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#D4AF37] transition-colors">
                          <MessageCircle size={12} className="text-[#D4AF37] group-hover:text-[#002342]" />
@@ -230,7 +231,7 @@ export default function AIChatButton() {
               {/* Indicador de carga */}
               {loading && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex justify-start">
-                  <div className="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-bl-sm flex gap-1.5 items-center backdrop-blur-sm">
+                  <div className="bg-white/5 border border-white/5 p-4 rounded-2xl rounded-bl-sm flex gap-1.5 items-center">
                     <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
                     <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                     <div className="w-1.5 h-1.5 bg-[#D4AF37] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
@@ -241,7 +242,7 @@ export default function AIChatButton() {
             </div>
 
             {/* Input Area */}
-            <div className="p-4 bg-black/20 border-t border-white/10 backdrop-blur-xl">
+            <div className="p-4 bg-black/20 border-t border-white/10 backdrop-blur-md"> {/* Blur reducido de xl a md */}
               <div className="relative flex items-center group">
                 <input
                   ref={inputRef}
