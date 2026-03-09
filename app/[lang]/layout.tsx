@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { LanguageProvider } from '../context/LanguageContext';
 import WhatsAppButton from '../components/WhatsAppButton';
 import AIChatButton from '../components/AIChatButton';
+import ConversionTracker from '../components/ConversionTracker';
 import { translations, Language } from '../lib/translations';
 import Script from 'next/script';
 import { Analytics } from "@vercel/analytics/next";
@@ -245,13 +246,14 @@ export default async function LangLayout({ children, params }: Props) {
         </noscript>
 
         <LanguageProvider initialLanguage={currentLang}>
+          <ConversionTracker />
           {children}
           <WhatsAppButton />
           <AIChatButton />
-          
+
           <Analytics />
           <SpeedInsights />
-          
+
         </LanguageProvider>
       </body>
     </html>

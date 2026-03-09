@@ -6,6 +6,7 @@ import { useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence, Variants } from 'framer-motion' 
 import { User, Phone, Mail, MessageSquare, CheckCircle2, ShieldCheck, Zap, XCircle } from 'lucide-react'
 import { track } from '@vercel/analytics/react' // 1. Importamos el tracker de Vercel
+import { trackFullConversion } from '../lib/tracking'
 
 // --- COLORES ---
 const API_URL = '/api/zapier-contact'; 
@@ -152,8 +153,18 @@ function ContactFormContent() {
 
         if (response.ok) {
             // Ejecutar tus pixels de conversión existentes (FB, TikTok, GA)
-            trackConversionEvents(); 
-            
+            trackConversionEvents();
+
+            // FASE 3: dataLayer push → GTM → GA4 (form_submit)
+            trackFullConversion('form_submit', 'contact_form', {
+                form_type: 'consultation_request',
+            });
+
+            // FASE 3: qualified_lead — se dispara tras respuesta exitosa del servidor
+            trackFullConversion('qualified_lead', 'contact_form', {
+                form_type: 'consultation_request',
+            });
+
             // 2. VERCEL ANALYTICS TRACKING (NUEVO)
             // Se registra solo si la API responde 200 OK
             track('Contact Form Submit', {

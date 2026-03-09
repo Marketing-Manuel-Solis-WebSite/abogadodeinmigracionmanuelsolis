@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { track } from '@vercel/analytics/react'; // 1. Importar track de Vercel
+import { trackFullConversion } from '../lib/tracking';
 
 export default function WhatsAppButton() {
   const [showTooltip, setShowTooltip] = useState(false);
@@ -22,7 +23,12 @@ export default function WhatsAppButton() {
   
   const handleClick = () => {
     window.open(whatsappUrl, '_blank');
-    
+
+    // FASE 3: dataLayer push → GTM + Flight Check API
+    trackFullConversion('whatsapp_click', 'whatsapp_cta', {
+      page_path: typeof window !== 'undefined' ? window.location.pathname : '',
+    });
+
     // 2. Vercel Analytics Tracking (NUEVO)
     track('Whatsapp Click', {
       location: 'floating_button',
