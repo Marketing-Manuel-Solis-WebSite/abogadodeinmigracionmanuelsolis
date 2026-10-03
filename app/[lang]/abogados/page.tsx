@@ -384,31 +384,6 @@ const attorneys = [
     }
   },
   {
-    id: 'alexis-alvarez',
-    name: 'Alexis Alvarez',
-    image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Alexis-Alvarez.png',
-    role: { es: 'Abogada', en: 'Attorney' },
-    bio: {
-      es: [
-        "Originaria del Valle del Río Grande, Texas. Hija de trabajadores agrícolas migrantes. Esta historia familiar le dio una profunda admiración por la comunidad inmigrante.",
-        "Obtuvo su JD de la Facultad de Derecho Sturm de la Universidad de Denver."
-      ],
-      en: [
-        "Native of the Rio Grande Valley, Texas. Daughter of migrant farm workers. This family history gave her a deep admiration for the immigrant community.",
-        "She obtained her JD from the University of Denver Sturm College of Law."
-      ]
-    },
-    education: [
-      { es: "Universidad de Denver (Sturm College of Law)", en: "University of Denver (Sturm College of Law)" },
-      { es: "Universidad Texas A&M", en: "Texas A&M University" }
-    ],
-    admissions: ["Colorado"],
-    quote: {
-      es: "Cree firmemente en el principio de retribuir a la comunidad.",
-      en: "She firmly believes in the principle of giving back to the community."
-    }
-  },
-  {
     id: 'edward-s-reisman',
     name: 'Edward S. Reisman',
     image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Edward-Steven-Reisman.png',

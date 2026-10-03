@@ -48,12 +48,6 @@ const officeData = {
   // --- ABOGADOS (ACTUALIZADO SEGÚN TU LISTA) ---
   attorneys: [
     { 
-      name: 'Alexis Alvarez', 
-      role: { es: 'Abogada', en: 'Attorney' }, 
-      image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Alexis-Alvarez.png',
-      quote: { es: "Cree firmemente en el principio de retribuir a la comunidad.", en: "She firmly believes in the principle of giving back to the community." }
-    },
-    { 
       name: 'Edwin Zavala', 
       role: { es: 'Abogado', en: 'Attorney' }, 
       image: 'https://uenjwzjx3vckezns.public.blob.vercel-storage.com/Edwin%20Zavala.png',
