@@ -9,12 +9,12 @@ type Props = {
 // --- CONFIGURACIÓN SEO ESPECÍFICA DE LA OFICINA ---
 const OFFICE_INFO = {
   name: "Manuel Solis Law Firm - Harlingen",
-  address: "320 E Jackson St",
+  address: "320 E Jackson Ave",
   city: "Harlingen",
   state: "TX",
   zip: "78550",
   phone: "+1-956-597-7090",
-  // Coordenadas para 320 E Jackson St
+  // Coordenadas para 320 E Jackson Ave
   latitude: "26.1923", 
   longitude: "-97.6953",
   mapUrl: "https://share.google/usYVNMsAK6c9gaUWs" // URL GMB Correcta
@@ -25,12 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isEs = lang === 'es';
 
   const title = isEs 
-    ? `Abogados en Harlingen, TX (Jackson St) | Manuel Solís`
-    : `Lawyers in Harlingen, TX (Jackson St) | Manuel Solis`;
+    ? `Abogados en Harlingen, TX (Jackson Ave) | Manuel Solís`
+    : `Lawyers in Harlingen, TX (Jackson Ave) | Manuel Solis`;
 
   const description = isEs
-    ? `Oficina de Manuel Solís en Harlingen (E Jackson St). Abogados de inmigración en el Valle del Río Grande listos para ayudarle. ¡Consulta Gratis!`
-    : `Manuel Solis Law Office in Harlingen (E Jackson St). Immigration attorneys in the Rio Grande Valley ready to help you. Free Consultation!`;
+    ? `Oficina de Manuel Solís en Harlingen (E Jackson Ave). Abogados de inmigración en el Valle del Río Grande listos para ayudarle. ¡Consulta Gratis!`
+    : `Manuel Solis Law Office in Harlingen (E Jackson Ave). Immigration attorneys in the Rio Grande Valley ready to help you. Free Consultation!`;
 
   return {
     title,
