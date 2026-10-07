@@ -59,7 +59,10 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // CORREGIDO: Se agregó "|_vercel" para que analytics funcione
-    '/((?!api|_next/static|_next/image|_vercel|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Fuera del middleware: API, assets de Next, analytics de Vercel y CUALQUIER
+    // archivo con extensión. Antes solo se excluían imágenes, así que
+    // /robots.txt y /site.webmanifest se redirigían a /es/robots.txt y
+    // /es/site.webmanifest, que dan 404: Google no podía leer el robots.txt.
+    '/((?!api|_next/static|_next/image|_vercel|.*\\..*).*)',
   ],
 };
